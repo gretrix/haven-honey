@@ -22,9 +22,18 @@ npm run build
 echo "🔄 Restarting application..."
 pm2 restart haven-honey
 
+# Save PM2 process list
+echo "💾 Saving PM2 process list..."
+pm2 save
+
 # Show status
 echo "✅ Deployment complete!"
 pm2 status
+
+# Show recent logs
+echo ""
+echo "📋 Recent logs (last 20 lines):"
+pm2 logs haven-honey --lines 20 --nostream
 
 echo ""
 echo "🌐 Website: https://havenhoney.co"
