@@ -118,7 +118,7 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
-            className="mb-10"
+            className="mb-6"
           >
             <Image
               src="/images/haven-honey-logo-horizontal-transparent.png"
