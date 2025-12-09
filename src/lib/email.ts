@@ -225,3 +225,5 @@ export async function sendNotificationEmail(data: {
   await transporter.sendMail(mailOptions)
 }
 
+
+

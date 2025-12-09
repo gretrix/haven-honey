@@ -21,25 +21,28 @@ const staggerContainer = {
   },
 }
 
-// Service data
+// Service data with detailed info
 const services = [
   {
     title: 'Meal Prep',
     description: 'Comforting, homemade meals for busy families.',
     icon: '🍲',
     accent: 'honey',
+    details: 'I prepare fresh, homemade meals tailored to your family\'s needs and preferences. From weekly meal prep to special dietary requirements, I bring nourishment and care to your table.',
   },
   {
     title: 'Cleaning',
     description: 'Gentle, detailed care to make your home feel lighter.',
     icon: '✨',
     accent: 'sage',
+    details: 'More than just cleaning, I bring detailed attention and care to every corner of your home. From deep cleaning to regular maintenance, I help create the peaceful space you deserve.',
   },
   {
     title: 'Home Resets',
     description: 'Decluttering, refreshing, and restoring your spaces.',
     icon: '🏡',
     accent: 'honey',
+    details: 'Sometimes we all need a fresh start. I help declutter, organize, and refresh your spaces so you can breathe easier and enjoy your home again.',
   },
 ]
 
@@ -75,21 +78,21 @@ export default function Home() {
     <main className="overflow-hidden">
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-cream-100/90 backdrop-blur-md border-b border-cream-300/50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <a href="#" className="flex items-center gap-3">
+        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+          <a href="#" className="flex items-center gap-4">
             <Image
               src="/images/haven-honey-logo-circle-transparent.png"
               alt="Haven & Honey"
-              width={48}
-              height={48}
-              className="w-12 h-12"
+              width={56}
+              height={56}
+              className="w-14 h-14"
             />
-            <span className="font-serif text-lg text-brown hidden sm:block">Haven & Honey</span>
+            <span className="font-serif text-xl text-brown hidden sm:block">Haven & Honey</span>
           </a>
-          <div className="flex items-center gap-4 sm:gap-8">
-            <a href="#about" className="text-brown/70 hover:text-brown transition-colors text-sm sm:text-base">About</a>
-            <a href="#services" className="text-brown/70 hover:text-brown transition-colors text-sm sm:text-base">Services</a>
-            <a href="#contact" className="btn-primary text-sm py-2 px-4 sm:py-3 sm:px-6">Contact</a>
+          <div className="flex items-center gap-6 sm:gap-10">
+            <a href="#about" className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium">About</a>
+            <a href="#services" className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium">Services</a>
+            <a href="#contact" className="btn-primary text-base py-3 px-6 sm:py-4 sm:px-8">Contact</a>
           </div>
         </div>
       </nav>
@@ -127,15 +130,15 @@ export default function Home() {
             />
           </motion.div>
 
-          {/* Verse */}
+          {/* Verse - BIGGER */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
-            className="font-sans text-brown/60 italic text-sm sm:text-base mb-10 max-w-md mx-auto"
+            className="font-sans text-brown/70 italic text-xl sm:text-2xl mb-8 max-w-2xl mx-auto leading-relaxed"
           >
             &ldquo;Let all that you do be done in love.&rdquo;
-            <span className="block mt-1 not-italic text-sage">— 1 Corinthians 16:14</span>
+            <span className="block mt-2 not-italic text-sage text-lg sm:text-xl">— 1 Corinthians 16:14</span>
           </motion.p>
 
           {/* CTA Button */}
@@ -144,7 +147,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.6 }}
           >
-            <a href="#contact" className="btn-primary text-lg">
+            <a href="#contact" className="btn-primary text-lg px-10 py-4">
               Get in Touch
               <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
@@ -241,7 +244,9 @@ export default function Home() {
 
               <div className="mt-8 flex flex-wrap gap-4">
                 <a
-                  href="#"
+                  href="https://www.instagram.com/lifewithlindaaaa/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="btn-secondary inline-flex items-center gap-2"
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -249,7 +254,7 @@ export default function Home() {
                     <path d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8z"/>
                     <circle cx="18.406" cy="5.594" r="1.44"/>
                   </svg>
-                  Follow My Journey
+                  Follow @lifewithlindaaaa
                 </a>
               </div>
             </motion.div>
@@ -345,7 +350,7 @@ export default function Home() {
             whileInView="visible"
             viewport={{ once: true, margin: '-100px' }}
             variants={staggerContainer}
-            className="text-center mb-16"
+            className="text-center mb-12"
           >
             <motion.span
               variants={fadeInUp}
@@ -355,7 +360,7 @@ export default function Home() {
             </motion.span>
             <motion.h2
               variants={fadeInUp}
-              className="font-serif text-4xl sm:text-5xl text-brown"
+              className="font-serif text-5xl sm:text-6xl text-brown"
             >
               What I Offer
             </motion.h2>
@@ -372,20 +377,37 @@ export default function Home() {
               <motion.div
                 key={service.title}
                 variants={fadeInUp}
-                className="bg-cream-50 rounded-3xl p-8 sm:p-10 text-center card-hover shadow-lg shadow-brown/5 border border-cream-300/50"
+                className="group perspective-1000"
               >
-                <div className={`w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center text-4xl
-                  ${service.accent === 'honey' ? 'bg-honey/20' : 'bg-sage/20'}`}
-                >
-                  {service.icon}
+                <div className="relative w-full h-[400px] transition-transform duration-700 transform-style-3d group-hover:rotate-y-180">
+                  {/* Front of card */}
+                  <div className="absolute inset-0 backface-hidden bg-cream-50 rounded-3xl p-10 text-center shadow-lg shadow-brown/5 border border-cream-300/50">
+                    <div className={`w-24 h-24 mx-auto mb-6 rounded-2xl flex items-center justify-center text-5xl
+                      ${service.accent === 'honey' ? 'bg-honey/20' : 'bg-sage/20'}`}
+                    >
+                      {service.icon}
+                    </div>
+                    <h3 className="font-serif text-3xl text-brown mb-4">{service.title}</h3>
+                    <p className="text-brown/70 leading-relaxed text-lg mb-6">{service.description}</p>
+                    
+                    {/* Hover hint */}
+                    <div className="absolute bottom-6 left-0 right-0">
+                      <p className="text-sage/60 text-sm italic">Hover to learn more</p>
+                    </div>
+                  </div>
+                  
+                  {/* Back of card */}
+                  <div className={`absolute inset-0 backface-hidden rotate-y-180 rounded-3xl p-10 text-center shadow-lg border-2
+                    ${service.accent === 'honey' ? 'bg-honey/10 border-honey/30' : 'bg-sage/10 border-sage/30'}`}
+                  >
+                    <h3 className="font-serif text-2xl text-brown mb-6">{service.title}</h3>
+                    <p className="text-brown/80 leading-relaxed text-base">{service.details}</p>
+                    
+                    <div className={`w-12 h-1 mx-auto mt-8 rounded-full
+                      ${service.accent === 'honey' ? 'bg-honey' : 'bg-sage'}`}
+                    />
+                  </div>
                 </div>
-                <h3 className="font-serif text-2xl text-brown mb-4">{service.title}</h3>
-                <p className="text-brown/70 leading-relaxed">{service.description}</p>
-                
-                {/* Decorative accent */}
-                <div className={`w-12 h-1 mx-auto mt-6 rounded-full
-                  ${service.accent === 'honey' ? 'bg-honey' : 'bg-sage'}`}
-                />
               </motion.div>
             ))}
           </motion.div>
@@ -397,7 +419,7 @@ export default function Home() {
             transition={{ delay: 0.4 }}
             className="text-center mt-12"
           >
-            <a href="#contact" className="btn-sage">
+            <a href="#contact" className="btn-sage text-lg">
               Request More Info
               <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />

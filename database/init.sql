@@ -48,3 +48,5 @@ ORDER BY created_at DESC;
 -- Query to mark a submission as responded
 -- UPDATE contact_submissions SET status = 'responded' WHERE id = ?;
 
+
+
