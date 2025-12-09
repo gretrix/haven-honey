@@ -27,6 +27,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth">
+      <head>
+        <script async src="//www.instagram.com/embed.js"></script>
+      </head>
       <body>
         <Toaster
           position="top-center"
