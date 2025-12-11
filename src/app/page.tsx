@@ -31,11 +31,11 @@ const services = [
     details: 'I prepare fresh, homemade meals tailored to your family\'s needs and preferences. From weekly meal prep to special dietary requirements, I bring nourishment and care to your table.',
   },
   {
-    title: 'Cleaning',
-    description: 'Gentle, detailed care to make your home feel lighter.',
-    icon: '✨',
+    title: 'Heart-Aligned Matchmaking & Modern Dating Guidance',
+    description: 'Finding love shouldn\'t feel overwhelming.',
+    icon: '💕',
     accent: 'sage',
-    details: 'More than just cleaning, I bring detailed attention and care to every corner of your home. From deep cleaning to regular maintenance, I help create the peaceful space you deserve.',
+    details: 'I offer intentional support that blends curated introductions, dating strategy, and honest guidance — helping you choose partners who match your values, your lifestyle, and the future you\'re building. Whether you\'re starting fresh or ready to date with more clarity, I help you move with confidence, purpose, and real alignment.',
   },
   {
     title: 'Home Resets',
@@ -43,6 +43,13 @@ const services = [
     icon: '🏡',
     accent: 'honey',
     details: 'Sometimes we all need a fresh start. I help declutter, organize, and refresh your spaces so you can breathe easier and enjoy your home again.',
+  },
+  {
+    title: 'Life Coaching',
+    description: 'Change doesn\'t have to come from punishment or pressure.',
+    icon: '🌟',
+    accent: 'sage',
+    details: 'I guide clients through the kind of inner shifts that create real, lasting transformation — the same approach that helped me lose nearly 180 pounds across two years without fad diets or intense workout plans.',
   },
 ]
 
@@ -241,55 +248,43 @@ export default function Home() {
                   Haven & Honey was born from that calling — a place where warmth, intention, faith, and care all come together to serve busy families and overwhelmed hearts.
                 </p>
               </div>
-
-              <div className="mt-8 flex flex-wrap gap-4">
-                <a
-                  href="https://www.instagram.com/lifewithlindaaaa/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-secondary inline-flex items-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z"/>
-                    <path d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8z"/>
-                    <circle cx="18.406" cy="5.594" r="1.44"/>
-                  </svg>
-                  Follow @lifewithlindaaaa
-                </a>
-              </div>
             </motion.div>
           </motion.div>
         </div>
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════════
-          INSTAGRAM EMBED SECTION
+          INSTAGRAM SECTION
       ═══════════════════════════════════════════════════════════════════ */}
       <section className="section-padding bg-cream-100 relative">
-        <div className="max-w-2xl mx-auto px-6">
+        <div className="max-w-xl mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-8"
+            className="bg-cream-50 rounded-3xl p-8 shadow-lg shadow-brown/5 border border-cream-300/50 text-center"
           >
-            <h2 className="font-serif text-3xl sm:text-4xl text-brown mb-3">
+            <h2 className="font-serif text-3xl text-brown mb-3">
               Follow My Journey
             </h2>
-            <p className="text-brown/70">@lifewithlindaaaa on Instagram</p>
+            <p className="text-brown/70 mb-2">@lifewithlindaaaa</p>
+            <p className="text-brown/60 text-sm mb-6">Daily inspiration and home tips</p>
+            
+            <a
+              href="https://www.instagram.com/lifewithlindaaaa/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-brown text-cream-50 font-medium px-6 py-3 rounded-full hover:bg-brown/90 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z"/>
+                <path d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8z"/>
+                <circle cx="18.406" cy="5.594" r="1.44"/>
+              </svg>
+              Follow on Instagram
+            </a>
           </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="bg-cream-50 rounded-3xl p-6 shadow-lg shadow-brown/5"
-            dangerouslySetInnerHTML={{
-              __html: `<blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/lifewithlindaaaa/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14" style=" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:540px; min-width:326px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);"><div style="padding:16px;"> <a href="https://www.instagram.com/lifewithlindaaaa/?utm_source=ig_embed&amp;utm_campaign=loading" style=" background:#FFFFFF; line-height:0; padding:0 0; text-align:center; text-decoration:none; width:100%;" target="_blank"> <div style=" display: flex; flex-direction: row; align-items: center;"> <div style="background-color: #F4F4F4; border-radius: 50%; flex-grow: 0; height: 40px; margin-right: 14px; width: 40px;"></div> <div style="display: flex; flex-direction: column; flex-grow: 1; justify-content: center;"> <div style=" background-color: #F4F4F4; border-radius: 4px; flex-grow: 0; height: 14px; margin-bottom: 6px; width: 100px;"></div> <div style=" background-color: #F4F4F4; border-radius: 4px; flex-grow: 0; height: 14px; width: 60px;"></div></div></div><div style="padding: 19% 0;"></div> <div style="display:block; height:50px; margin:0 auto 12px; width:50px;"><svg width="50px" height="50px" viewBox="0 0 60 60" version="1.1" xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><g transform="translate(-511.000000, -20.000000)" fill="#000000"><g><path d="M556.869,30.41 C554.814,30.41 553.148,32.076 553.148,34.131 C553.148,36.186 554.814,37.852 556.869,37.852 C558.924,37.852 560.59,36.186 560.59,34.131 C560.59,32.076 558.924,30.41 556.869,30.41 M541,60.657 C535.114,60.657 530.342,55.887 530.342,50 C530.342,44.114 535.114,39.342 541,39.342 C546.887,39.342 551.658,44.114 551.658,50 C551.658,55.887 546.887,60.657 541,60.657 M541,33.886 C532.1,33.886 524.886,41.1 524.886,50 C524.886,58.899 532.1,66.113 541,66.113 C549.9,66.113 557.115,58.899 557.115,50 C557.115,41.1 549.9,33.886 541,33.886 M565.378,62.101 C565.244,65.022 564.756,66.606 564.346,67.663 C563.803,69.06 563.154,70.057 562.106,71.106 C561.058,72.155 560.06,72.803 558.662,73.347 C557.607,73.757 556.021,74.244 553.102,74.378 C549.944,74.521 548.997,74.552 541,74.552 C533.003,74.552 532.056,74.521 528.898,74.378 C525.979,74.244 524.393,73.757 523.338,73.347 C521.94,72.803 520.942,72.155 519.894,71.106 C518.846,70.057 518.197,69.06 517.654,67.663 C517.244,66.606 516.755,65.022 516.623,62.101 C516.479,58.943 516.448,57.996 516.448,50 C516.448,42.003 516.479,41.056 516.623,37.899 C516.755,34.978 517.244,33.391 517.654,32.338 C518.197,30.938 518.846,29.942 519.894,28.894 C520.942,27.846 521.94,27.196 523.338,26.654 C524.393,26.244 525.979,25.756 528.898,25.623 C532.057,25.479 533.004,25.448 541,25.448 C548.997,25.448 549.943,25.479 553.102,25.623 C556.021,25.756 557.607,26.244 558.662,26.654 C560.06,27.196 561.058,27.846 562.106,28.894 C563.154,29.942 563.803,30.938 564.346,32.338 C564.756,33.391 565.244,34.978 565.378,37.899 C565.522,41.056 565.552,42.003 565.552,50 C565.552,57.996 565.522,58.943 565.378,62.101 M570.82,37.631 C570.674,34.438 570.167,32.258 569.425,30.349 C568.659,28.377 567.633,26.702 565.965,25.035 C564.297,23.368 562.623,22.342 560.652,21.575 C558.743,20.834 556.562,20.326 553.369,20.18 C550.169,20.033 549.148,20 541,20 C532.853,20 531.831,20.033 528.631,20.18 C525.438,20.326 523.257,20.834 521.349,21.575 C519.376,22.342 517.703,23.368 516.035,25.035 C514.368,26.702 513.342,28.377 512.574,30.349 C511.834,32.258 511.326,34.438 511.181,37.631 C511.035,40.831 511,41.851 511,50 C511,58.147 511.035,59.17 511.181,62.369 C511.326,65.562 511.834,67.743 512.574,69.651 C513.342,71.625 514.368,73.296 516.035,74.965 C517.703,76.634 519.376,77.658 521.349,78.425 C523.257,79.167 525.438,79.673 528.631,79.82 C531.831,79.965 532.853,80.001 541,80.001 C549.148,80.001 550.169,79.965 553.369,79.82 C556.562,79.673 558.743,79.167 560.652,78.425 C562.623,77.658 564.297,76.634 565.965,74.965 C567.633,73.296 568.659,71.625 569.425,69.651 C570.167,67.743 570.674,65.562 570.82,62.369 C570.966,59.17 571,58.147 571,50 C571,41.851 570.966,40.831 570.82,37.631"></path></g></g></g></svg></div><div style="padding-top: 8px;"> <div style=" color:#3897f0; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:550; line-height:18px;">View this profile on Instagram</div></div><div style="padding: 12.5% 0;"></div> <div style="display: flex; flex-direction: row; margin-bottom: 14px; align-items: center;"><div> <div style="background-color: #F4F4F4; border-radius: 50%; height: 12.5px; width: 12.5px; transform: translateX(0px) translateY(7px);"></div> <div style="background-color: #F4F4F4; height: 12.5px; transform: rotate(-45deg) translateX(3px) translateY(1px); width: 12.5px; flex-grow: 0; margin-right: 14px; margin-left: 2px;"></div> <div style="background-color: #F4F4F4; border-radius: 50%; height: 12.5px; width: 12.5px; transform: translateX(9px) translateY(-18px);"></div></div><div style="margin-left: 8px;"> <div style=" background-color: #F4F4F4; border-radius: 50%; flex-grow: 0; height: 20px; width: 20px;"></div> <div style=" width: 0; height: 0; border-top: 2px solid transparent; border-left: 6px solid #F4F4F4; border-bottom: 2px solid transparent; transform: translateX(16px) translateY(-4px) rotate(30deg)"></div></div><div style="margin-left: auto;"> <div style=" width: 0px; border-top: 8px solid #F4F4F4; border-right: 8px solid transparent; transform: translateY(16px);"></div> <div style=" background-color: #F4F4F4; flex-grow: 0; height: 12px; width: 16px; transform: translateY(-4px);"></div> <div style=" width: 0; height: 0; border-top: 8px solid #F4F4F4; border-left: 8px solid transparent; transform: translateY(-4px) translateX(8px);"></div></div></div> <div style="display: flex; flex-direction: column; flex-grow: 1; justify-content: center; margin-bottom: 24px;"> <div style=" background-color: #F4F4F4; border-radius: 4px; flex-grow: 0; height: 14px; margin-bottom: 6px; width: 224px;"></div> <div style=" background-color: #F4F4F4; border-radius: 4px; flex-grow: 0; height: 14px; width: 144px;"></div></div></a><p style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;"><a href="https://www.instagram.com/lifewithlindaaaa/?utm_source=ig_embed&amp;utm_campaign=loading" style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px;" target="_blank">Linda Tremblay</a> (@<a href="https://www.instagram.com/lifewithlindaaaa/?utm_source=ig_embed&amp;utm_campaign=loading" style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px;" target="_blank">lifewithlindaaaa</a>) • Instagram photos and videos</p></div></blockquote><script async src="//www.instagram.com/embed.js"></script>`
-            }}
-          />
         </div>
       </section>
 
@@ -402,7 +397,7 @@ export default function Home() {
             whileInView="visible"
             viewport={{ once: true, margin: '-100px' }}
             variants={staggerContainer}
-            className="grid md:grid-cols-3 gap-8"
+            className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
           >
             {services.map((service, index) => (
               <motion.div
@@ -410,16 +405,16 @@ export default function Home() {
                 variants={fadeInUp}
                 className="group perspective-1000"
               >
-                <div className="relative w-full h-[400px] transition-transform duration-700 transform-style-3d group-hover:rotate-y-180">
+                <div className="relative w-full h-[450px] transition-transform duration-700 transform-style-3d group-hover:rotate-y-180">
                   {/* Front of card */}
-                  <div className="absolute inset-0 backface-hidden bg-cream-50 rounded-3xl p-10 text-center shadow-lg shadow-brown/5 border border-cream-300/50">
-                    <div className={`w-24 h-24 mx-auto mb-6 rounded-2xl flex items-center justify-center text-5xl
+                  <div className="absolute inset-0 backface-hidden bg-cream-50 rounded-3xl p-8 text-center shadow-lg shadow-brown/5 border border-cream-300/50 overflow-hidden">
+                    <div className={`w-20 h-20 mx-auto mb-4 rounded-2xl flex items-center justify-center text-4xl
                       ${service.accent === 'honey' ? 'bg-honey/20' : 'bg-sage/20'}`}
                     >
                       {service.icon}
                     </div>
-                    <h3 className="font-serif text-3xl text-brown mb-4">{service.title}</h3>
-                    <p className="text-brown/70 leading-relaxed text-lg mb-6">{service.description}</p>
+                    <h3 className="font-serif text-2xl text-brown mb-3 leading-tight">{service.title}</h3>
+                    <p className="text-brown/70 leading-relaxed text-base mb-6">{service.description}</p>
                     
                     {/* Hover hint */}
                     <div className="absolute bottom-6 left-0 right-0">
@@ -428,13 +423,13 @@ export default function Home() {
                   </div>
                   
                   {/* Back of card */}
-                  <div className={`absolute inset-0 backface-hidden rotate-y-180 rounded-3xl p-10 text-center shadow-lg border-2
+                  <div className={`absolute inset-0 backface-hidden rotate-y-180 rounded-3xl p-8 text-center shadow-lg border-2 overflow-hidden
                     ${service.accent === 'honey' ? 'bg-honey/10 border-honey/30' : 'bg-sage/10 border-sage/30'}`}
                   >
-                    <h3 className="font-serif text-2xl text-brown mb-6">{service.title}</h3>
-                    <p className="text-brown/80 leading-relaxed text-base">{service.details}</p>
+                    <h3 className="font-serif text-xl text-brown mb-4 leading-tight">{service.title}</h3>
+                    <p className="text-brown/80 leading-relaxed text-sm">{service.details}</p>
                     
-                    <div className={`w-12 h-1 mx-auto mt-8 rounded-full
+                    <div className={`w-12 h-1 mx-auto mt-6 rounded-full
                       ${service.accent === 'honey' ? 'bg-honey' : 'bg-sage'}`}
                     />
                   </div>

@@ -53,8 +53,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           }}
         />
         {/* End Google Analytics */}
-
-        <script async src="//www.instagram.com/embed.js"></script>
       </head>
       <body>
         {/* Google Tag Manager (noscript) */}
