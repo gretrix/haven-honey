@@ -225,6 +225,113 @@ export async function sendNotificationEmail(data: {
   await transporter.sendMail(mailOptions)
 }
 
+// Send mass email to contacts
+export async function sendMassEmail(
+  to: string,
+  recipientName: string,
+  subject: string,
+  messageContent: string
+) {
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${subject}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Georgia', serif; background-color: #F8F3EB;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table role="presentation" style="max-width: 600px; width: 100%; background-color: #FDFBF7; border-radius: 16px; box-shadow: 0 4px 24px rgba(78, 59, 50, 0.1);">
+          
+          <!-- Header -->
+          <tr>
+            <td align="center" style="padding: 40px 40px 20px;">
+              <h1 style="margin: 0; font-size: 32px; color: #4E3B32; font-weight: 500;">Haven & Honey</h1>
+              <p style="margin: 8px 0 0; font-size: 14px; color: #8B9A7D; font-style: italic;">Making Homes Feel Loved</p>
+            </td>
+          </tr>
+          
+          <!-- Divider -->
+          <tr>
+            <td align="center" style="padding: 0 40px;">
+              <div style="width: 80px; height: 2px; background: linear-gradient(90deg, transparent, #D4A853, transparent);"></div>
+            </td>
+          </tr>
+          
+          <!-- Content -->
+          <tr>
+            <td style="padding: 30px 40px;">
+              <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.7; color: #6B5448;">
+                Hello ${recipientName},
+              </p>
+              <div style="margin: 0; font-size: 16px; line-height: 1.7; color: #6B5448; white-space: pre-wrap;">
+${messageContent}
+              </div>
+              <p style="margin: 20px 0 0; font-size: 16px; line-height: 1.7; color: #6B5448;">
+                With warmth and care,<br>
+                <strong style="color: #4E3B32;">Linda</strong><br>
+                <span style="color: #8B9A7D; font-size: 14px;">Haven & Honey</span>
+              </p>
+            </td>
+          </tr>
+          
+          <!-- CTA -->
+          <tr>
+            <td align="center" style="padding: 20px 40px;">
+              <a href="https://havenhoney.co/contact" style="display: inline-block; padding: 14px 32px; background-color: #4E3B32; color: #FDFBF7; text-decoration: none; border-radius: 50px; font-weight: 500;">
+                Visit Haven & Honey
+              </a>
+            </td>
+          </tr>
+          
+          <!-- Quote -->
+          <tr>
+            <td align="center" style="padding: 20px 40px 40px;">
+              <div style="background-color: #F8F3EB; padding: 24px; border-radius: 12px; border-left: 4px solid #D4A853;">
+                <p style="margin: 0; font-size: 14px; font-style: italic; color: #6B5448;">
+                  "Let all that you do be done in love."
+                </p>
+                <p style="margin: 8px 0 0; font-size: 12px; color: #8B9A7D;">
+                  — 1 Corinthians 16:14
+                </p>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding: 20px 40px; background-color: #4E3B32; border-radius: 0 0 16px 16px;">
+              <p style="margin: 0; font-size: 12px; color: #E5D9C5;">
+                © ${new Date().getFullYear()} Haven & Honey. All rights reserved.
+              </p>
+              <p style="margin: 8px 0 0; font-size: 11px; color: #E5D9C5;">
+                <a href="https://www.instagram.com/lifewithlindaaaa/" style="color: #D4A853; text-decoration: none;">@lifewithlindaaaa</a>
+              </p>
+            </td>
+          </tr>
+          
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `
+
+  const mailOptions = {
+    from: `"Haven & Honey" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+    to,
+    subject,
+    html,
+    replyTo: process.env.LINDA_EMAIL || 'linda@havenhoney.co',
+  }
+
+  await transporter.sendMail(mailOptions)
+}
+
 
 
 

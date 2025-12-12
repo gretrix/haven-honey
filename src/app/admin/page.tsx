@@ -20,6 +20,11 @@ export default function AdminDashboard() {
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [loading, setLoading] = useState(false)
   const [filter, setFilter] = useState<'all' | 'new' | 'read' | 'responded'>('all')
+  const [selectedIds, setSelectedIds] = useState<number[]>([])
+  const [showMassEmail, setShowMassEmail] = useState(false)
+  const [emailSubject, setEmailSubject] = useState('')
+  const [emailMessage, setEmailMessage] = useState('')
+  const [sendingEmail, setSendingEmail] = useState(false)
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
@@ -126,6 +131,62 @@ export default function AdminDashboard() {
     a.click()
   }
 
+  const toggleSelectAll = () => {
+    if (selectedIds.length === submissions.length) {
+      setSelectedIds([])
+    } else {
+      setSelectedIds(submissions.map(s => s.id))
+    }
+  }
+
+  const toggleSelect = (id: number) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    )
+  }
+
+  const sendMassEmail = async () => {
+    if (!emailSubject || !emailMessage) {
+      toast.error('Please enter subject and message')
+      return
+    }
+
+    setSendingEmail(true)
+    const savedPassword = localStorage.getItem('admin_password')
+
+    try {
+      const response = await fetch('/api/admin/mass-email', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${savedPassword}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          subject: emailSubject,
+          message: emailMessage,
+          recipientIds: selectedIds.length > 0 ? selectedIds : undefined,
+          sendToAll: selectedIds.length === 0,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success(`✅ Sent ${data.sent} emails successfully!`)
+        setShowMassEmail(false)
+        setEmailSubject('')
+        setEmailMessage('')
+        setSelectedIds([])
+      } else {
+        toast.error(data.error || 'Failed to send emails')
+      }
+    } catch (error) {
+      toast.error('Error sending emails')
+    } finally {
+      setSendingEmail(false)
+    }
+  }
+
   useEffect(() => {
     const savedPassword = localStorage.getItem('admin_password')
     if (savedPassword) {
@@ -181,6 +242,13 @@ export default function AdminDashboard() {
             </div>
             <div className="flex gap-2">
               <button
+                onClick={() => setShowMassEmail(true)}
+                className="btn-primary text-sm"
+                disabled={submissions.length === 0}
+              >
+                📧 Mass Email
+              </button>
+              <button
                 onClick={exportToCSV}
                 className="btn-secondary text-sm"
                 disabled={submissions.length === 0}
@@ -213,6 +281,28 @@ export default function AdminDashboard() {
               </button>
             ))}
           </div>
+
+          {/* Selection Controls */}
+          {submissions.length > 0 && (
+            <div className="flex items-center gap-4 mt-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={selectedIds.length === submissions.length}
+                  onChange={toggleSelectAll}
+                  className="w-4 h-4 rounded border-brown/30"
+                />
+                <span className="text-sm text-brown/80">
+                  Select All ({submissions.length})
+                </span>
+              </label>
+              {selectedIds.length > 0 && (
+                <span className="text-sm text-sage font-medium">
+                  {selectedIds.length} selected
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Loading */}
@@ -220,6 +310,112 @@ export default function AdminDashboard() {
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-brown/20 border-t-brown"></div>
             <p className="text-brown/60 mt-4">Loading submissions...</p>
+          </div>
+        )}
+
+        {/* Mass Email Modal */}
+        {showMassEmail && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-cream-50 rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            >
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h2 className="font-serif text-3xl text-brown mb-2">Send Mass Email</h2>
+                  <p className="text-brown/60">
+                    {selectedIds.length > 0
+                      ? `Sending to ${selectedIds.length} selected contact${selectedIds.length !== 1 ? 's' : ''}`
+                      : `Sending to all ${submissions.length} contacts`}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowMassEmail(false)}
+                  className="text-brown/60 hover:text-brown text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-brown mb-2">
+                    Subject <span className="text-honey">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={emailSubject}
+                    onChange={(e) => setEmailSubject(e.target.value)}
+                    placeholder="e.g., Special Offer from Haven & Honey"
+                    className="form-input"
+                    disabled={sendingEmail}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-brown mb-2">
+                    Message <span className="text-honey">*</span>
+                  </label>
+                  <textarea
+                    value={emailMessage}
+                    onChange={(e) => setEmailMessage(e.target.value)}
+                    placeholder="Write your message here... (Recipients will see: Hello [Name], [Your message])"
+                    className="form-textarea"
+                    rows={8}
+                    disabled={sendingEmail}
+                  />
+                  <p className="text-brown/50 text-sm mt-2">
+                    💡 Each email will be personalized with the recipient's name
+                  </p>
+                </div>
+
+                <div className="bg-honey/10 border border-honey/30 rounded-2xl p-4">
+                  <p className="text-brown/80 text-sm">
+                    <strong>Preview:</strong> Emails will include your message, Linda's signature, and the Haven & Honey branding.
+                  </p>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={sendMassEmail}
+                    disabled={sendingEmail || !emailSubject || !emailMessage}
+                    className="btn-primary flex-1 disabled:opacity-50"
+                  >
+                    {sendingEmail ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                            fill="none"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          />
+                        </svg>
+                        Sending...
+                      </span>
+                    ) : (
+                      'Send Emails'
+                    )}
+                  </button>
+                  <button
+                    onClick={() => setShowMassEmail(false)}
+                    className="btn-secondary flex-1"
+                    disabled={sendingEmail}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </motion.div>
           </div>
         )}
 
@@ -238,7 +434,17 @@ export default function AdminDashboard() {
               animate={{ opacity: 1, y: 0 }}
               className="bg-cream-50 rounded-3xl p-6 shadow-lg hover:shadow-xl transition-shadow"
             >
-              <div className="flex flex-col sm:flex-row justify-between gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
+                {/* Checkbox */}
+                <div className="flex items-start pt-1">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.includes(submission.id)}
+                    onChange={() => toggleSelect(submission.id)}
+                    className="w-5 h-5 rounded border-brown/30 cursor-pointer"
+                  />
+                </div>
+
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-3">
                     <div>
