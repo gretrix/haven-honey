@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 
 // Validation schema
 const contactSchema = z.object({
@@ -20,6 +21,7 @@ type ContactFormData = z.infer<typeof contactSchema>
 export default function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const { executeRecaptcha } = useGoogleReCaptcha()
 
   const {
     register,
@@ -34,10 +36,19 @@ export default function ContactForm() {
     setIsSubmitting(true)
 
     try {
+      // Execute reCAPTCHA
+      if (!executeRecaptcha) {
+        toast.error('reCAPTCHA not loaded. Please refresh the page.')
+        setIsSubmitting(false)
+        return
+      }
+
+      const recaptchaToken = await executeRecaptcha('contact_form')
+
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, recaptchaToken }),
       })
 
       const result = await response.json()

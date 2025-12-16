@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json()
-    const { name, email, phone, message } = body
+    const { name, email, phone, message, recaptchaToken } = body
 
     // Validate required fields
     if (!name || !email || !message) {
@@ -37,6 +37,37 @@ export async function POST(request: NextRequest) {
         { success: false, error: 'Please provide a valid email address' },
         { status: 400 }
       )
+    }
+
+    // Verify reCAPTCHA token
+    if (recaptchaToken) {
+      try {
+        const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY
+        if (recaptchaSecret) {
+          const recaptchaResponse = await fetch(
+            'https://www.google.com/recaptcha/api/siteverify',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: `secret=${recaptchaSecret}&response=${recaptchaToken}`,
+            }
+          )
+
+          const recaptchaData = await recaptchaResponse.json()
+
+          // Check if reCAPTCHA verification failed or score is too low
+          if (!recaptchaData.success || recaptchaData.score < 0.5) {
+            console.warn('reCAPTCHA verification failed:', recaptchaData)
+            return NextResponse.json(
+              { success: false, error: 'Bot detection failed. Please try again.' },
+              { status: 400 }
+            )
+          }
+        }
+      } catch (recaptchaError) {
+        console.error('reCAPTCHA verification error:', recaptchaError)
+        // Continue anyway - don't block legitimate users if reCAPTCHA service is down
+      }
     }
 
     // Store in database

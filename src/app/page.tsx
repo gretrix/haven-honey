@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef, useState } from 'react'
 import ContactForm from '@/components/ContactForm'
+import ReCaptchaProvider from '@/components/ReCaptchaProvider'
 
 // Animation variants
 const fadeInUp = {
@@ -559,7 +560,9 @@ export default function Home() {
 
           {/* Contact Form */}
           <div className="bg-cream-100 rounded-3xl p-8 sm:p-12 shadow-xl shadow-brown/5 border border-cream-300/50">
-            <ContactForm />
+            <ReCaptchaProvider>
+              <ContactForm />
+            </ReCaptchaProvider>
           </div>
 
           {/* Additional contact info */}
