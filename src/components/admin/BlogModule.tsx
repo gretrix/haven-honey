@@ -613,7 +613,7 @@ export default function BlogModule() {
               {post.featured_image_url && (
                 <div className="flex-shrink-0 w-32 h-32 rounded-2xl overflow-hidden bg-cream-100">
                   <img
-                    src={post.featured_image_url}
+                    src={`/api${post.featured_image_url}`}
                     alt={post.title}
                     className="w-full h-full object-cover"
                   />

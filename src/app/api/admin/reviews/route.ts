@@ -88,12 +88,15 @@ export async function POST(request: NextRequest) {
     const isPublished = formData.get('is_published') === 'true'
     const displayOrder = formData.get('display_order') ? parseInt(formData.get('display_order') as string) : 0
 
+    // Convert date to MySQL DATE format (YYYY-MM-DD)
+    const formattedDate = reviewDate ? new Date(reviewDate).toISOString().split('T')[0] : null
+    
     // Insert into database
     const [result] = await pool.execute(
       `INSERT INTO reviews 
        (reviewer_name, review_date, star_rating, review_text, screenshot_url, tag, is_featured, is_published, display_order) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [reviewerName || null, reviewDate || null, starRating, reviewText || null, uploadResult.url, tag, isFeatured, isPublished, displayOrder]
+      [reviewerName || null, formattedDate, starRating, reviewText || null, uploadResult.url, tag, isFeatured, isPublished, displayOrder]
     )
 
     const insertResult = result as any
@@ -152,8 +155,15 @@ export async function PATCH(request: NextRequest) {
 
     for (const field of allowedFields) {
       if (updateFields[field] !== undefined) {
+        let value = updateFields[field]
+        
+        // Convert date to MySQL DATE format (YYYY-MM-DD)
+        if (field === 'review_date' && value) {
+          value = new Date(value).toISOString().split('T')[0]
+        }
+        
         updates.push(`${field} = ?`)
-        values.push(updateFields[field])
+        values.push(value)
       }
     }
 

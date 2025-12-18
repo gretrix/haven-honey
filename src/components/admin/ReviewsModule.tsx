@@ -520,7 +520,7 @@ export default function ReviewsModule() {
             {/* Screenshot */}
             <div className="relative mb-4 rounded-2xl overflow-hidden bg-cream-100 aspect-[4/3]">
               <img
-                src={review.screenshot_url}
+                src={`/api${review.screenshot_url}`}
                 alt={`Review from ${review.reviewer_name || 'Anonymous'}`}
                 className="w-full h-full object-contain"
               />

@@ -99,12 +99,15 @@ export async function POST(request: NextRequest) {
     const isPublished = formData.get('is_published') === 'true'
     const displayOrder = formData.get('display_order') ? parseInt(formData.get('display_order') as string) : 0
 
+    // Convert date to MySQL DATE format (YYYY-MM-DD)
+    const formattedDate = photoDate ? new Date(photoDate).toISOString().split('T')[0] : null
+    
     // Insert into database
     const [result] = await pool.execute(
       `INSERT INTO work_photos 
        (category, caption, description, image_url, photo_date, is_published, display_order) 
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [category, caption || null, description || null, uploadResult.url, photoDate || null, isPublished, displayOrder]
+      [category, caption || null, description || null, uploadResult.url, formattedDate, isPublished, displayOrder]
     )
 
     const insertResult = result as any
@@ -163,8 +166,15 @@ export async function PATCH(request: NextRequest) {
 
     for (const field of allowedFields) {
       if (updateFields[field] !== undefined) {
+        let value = updateFields[field]
+        
+        // Convert date to MySQL DATE format (YYYY-MM-DD)
+        if (field === 'photo_date' && value) {
+          value = new Date(value).toISOString().split('T')[0]
+        }
+        
         updates.push(`${field} = ?`)
-        values.push(updateFields[field])
+        values.push(value)
       }
     }
 

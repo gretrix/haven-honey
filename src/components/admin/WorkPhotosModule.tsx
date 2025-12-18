@@ -502,7 +502,7 @@ export default function WorkPhotosModule() {
             {/* Photo */}
             <div className="relative mb-4 rounded-2xl overflow-hidden bg-cream-100 aspect-[4/3]">
               <img
-                src={photo.image_url}
+                src={`/api${photo.image_url}`}
                 alt={photo.caption || photo.category}
                 className="w-full h-full object-cover"
               />
