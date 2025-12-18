@@ -199,7 +199,7 @@ export default function ReviewsPage() {
                   <div className="relative bg-cream-100 rounded-2xl overflow-hidden mb-4 border-4 border-cream-200 shadow-inner">
                     <div className="aspect-[4/3]">
                       <img
-                        src={review.screenshot_url}
+                        src={`/api${review.screenshot_url}`}
                         alt={`Review from ${review.reviewer_name || 'Client'}`}
                         className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                       />
@@ -278,7 +278,7 @@ export default function ReviewsPage() {
               {/* Screenshot */}
               <div className="relative bg-cream-100 rounded-2xl overflow-hidden mb-6 border-4 border-cream-200">
                 <img
-                  src={selectedReview.screenshot_url}
+                  src={`/api${selectedReview.screenshot_url}`}
                   alt={`Review from ${selectedReview.reviewer_name || 'Client'}`}
                   className="w-full h-auto max-h-[60vh] object-contain"
                 />

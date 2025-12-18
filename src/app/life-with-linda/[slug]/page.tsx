@@ -174,7 +174,7 @@ export default function BlogPostPage() {
               className="mb-12 rounded-3xl overflow-hidden shadow-2xl"
             >
               <img
-                src={post.featured_image_url}
+                src={`/api${post.featured_image_url}`}
                 alt={post.title}
                 className="w-full h-auto"
               />

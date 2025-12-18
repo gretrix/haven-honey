@@ -188,7 +188,7 @@ export default function WorkPage() {
                   <div className="relative bg-cream-100 rounded-2xl overflow-hidden mb-3">
                     <div className="aspect-square">
                       <img
-                        src={photo.image_url}
+                        src={`/api${photo.image_url}`}
                         alt={photo.caption || photo.category}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
@@ -249,7 +249,7 @@ export default function WorkPage() {
                 {/* Image Side */}
                 <div className="md:col-span-3 bg-cream-100">
                   <img
-                    src={selectedPhoto.image_url}
+                    src={`/api${selectedPhoto.image_url}`}
                     alt={selectedPhoto.caption || selectedPhoto.category}
                     className="w-full h-full object-cover max-h-[70vh] md:max-h-screen"
                   />

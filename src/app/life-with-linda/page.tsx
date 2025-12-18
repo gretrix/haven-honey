@@ -196,7 +196,7 @@ export default function LifeWithLindaPage() {
                     {post.featured_image_url ? (
                       <div className="relative aspect-[16/10] overflow-hidden bg-cream-100">
                         <img
-                          src={post.featured_image_url}
+                          src={`/api${post.featured_image_url}`}
                           alt={post.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
