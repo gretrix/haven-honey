@@ -22,12 +22,12 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status') || 'all'
     const limit = parseInt(searchParams.get('limit') || '50')
 
-    // Build query
-    let query = 'SELECT * FROM contact_submissions'
+    // Build query (exclude soft-deleted contacts)
+    let query = 'SELECT * FROM contact_submissions WHERE deleted_at IS NULL'
     const params: string[] = []
 
     if (status !== 'all') {
-      query += ' WHERE status = ?'
+      query += ' AND status = ?'
       params.push(status)
     }
 
@@ -88,6 +88,54 @@ export async function PATCH(request: NextRequest) {
     console.error('Admin API error:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to update status' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    // Check authentication
+    const authHeader = request.headers.get('authorization')
+    const providedPassword = authHeader?.replace('Bearer ', '')
+
+    if (providedPassword !== ADMIN_PASSWORD) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    const permanent = searchParams.get('permanent') === 'true'
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: 'Contact ID is required' },
+        { status: 400 }
+      )
+    }
+
+    if (permanent) {
+      // Permanent delete (hard delete)
+      await pool.execute('DELETE FROM contact_submissions WHERE id = ?', [id])
+    } else {
+      // Soft delete
+      await pool.execute(
+        'UPDATE contact_submissions SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?',
+        [id]
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: permanent ? 'Contact permanently deleted' : 'Contact moved to trash',
+    })
+  } catch (error) {
+    console.error('Admin API delete error:', error)
+    return NextResponse.json(
+      { success: false, error: 'Failed to delete contact' },
       { status: 500 }
     )
   }
