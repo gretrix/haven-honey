@@ -6,8 +6,9 @@ import toast from 'react-hot-toast'
 import CRMModule from '@/components/admin/CRMModule'
 import ReviewsModule from '@/components/admin/ReviewsModule'
 import WorkPhotosModule from '@/components/admin/WorkPhotosModule'
+import BlogModule from '@/components/admin/BlogModule'
 
-type TabType = 'crm' | 'reviews' | 'work-photos'
+type TabType = 'crm' | 'reviews' | 'work-photos' | 'blog'
 
 export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -95,6 +96,16 @@ export default function AdminDashboard() {
               📇 CRM / Contacts
             </button>
             <button
+              onClick={() => setActiveTab('blog')}
+              className={`px-6 py-3 rounded-full text-sm font-medium transition-colors ${
+                activeTab === 'blog'
+                  ? 'bg-brown text-cream-50'
+                  : 'bg-cream-100 text-brown hover:bg-cream-200'
+              }`}
+            >
+              ✏️ Blog
+            </button>
+            <button
               onClick={() => setActiveTab('reviews')}
               className={`px-6 py-3 rounded-full text-sm font-medium transition-colors ${
                 activeTab === 'reviews'
@@ -125,6 +136,7 @@ export default function AdminDashboard() {
           transition={{ duration: 0.3 }}
         >
           {activeTab === 'crm' && <CRMModule />}
+          {activeTab === 'blog' && <BlogModule />}
           {activeTab === 'reviews' && <ReviewsModule />}
           {activeTab === 'work-photos' && <WorkPhotosModule />}
         </motion.div>

@@ -306,15 +306,29 @@ export default function WorkPhotosModule() {
                 <label className="block text-sm font-medium text-brown mb-2">
                   Photo {!editingPhoto && <span className="text-honey">*</span>}
                 </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    setImage(e.target.files ? e.target.files[0] : null)
-                  }
-                  className="form-input"
-                  required={!editingPhoto}
-                />
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      setImage(e.target.files ? e.target.files[0] : null)
+                    }
+                    className="hidden"
+                    id="photo-upload"
+                    required={!editingPhoto}
+                  />
+                  <label
+                    htmlFor="photo-upload"
+                    className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-cream-100 border-2 border-dashed border-brown/30 rounded-2xl cursor-pointer hover:bg-cream-200 hover:border-brown/50 transition-colors"
+                  >
+                    <svg className="w-5 h-5 text-brown/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span className="text-brown/70">
+                      {image ? image.name : 'Choose work photo'}
+                    </span>
+                  </label>
+                </div>
                 {editingPhoto && (
                   <p className="text-sm text-brown/60 mt-1">
                     Leave empty to keep existing photo
@@ -407,7 +421,7 @@ export default function WorkPhotosModule() {
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-2 cursor-pointer mt-7">
+                  <label className="flex items-center gap-3 cursor-pointer mt-7 p-3 bg-sage/10 rounded-xl hover:bg-sage/20 transition-colors">
                     <input
                       type="checkbox"
                       checked={formData.is_published}
@@ -417,9 +431,12 @@ export default function WorkPhotosModule() {
                           is_published: e.target.checked,
                         })
                       }
-                      className="w-4 h-4 rounded"
+                      className="w-5 h-5 rounded border-2 border-sage text-sage focus:ring-2 focus:ring-sage/50 cursor-pointer"
                     />
-                    <span className="text-sm text-brown">Published</span>
+                    <div>
+                      <span className="text-sm font-medium text-brown block">✓ Published</span>
+                      <span className="text-xs text-brown/60">Visible to public</span>
+                    </div>
                   </label>
                 </div>
               </div>

@@ -45,7 +45,7 @@ export function generateUniqueFilename(originalName: string): string {
 // Save uploaded file
 export async function saveUploadedFile(
   file: File,
-  folder: 'reviews' | 'work-photos'
+  folder: 'reviews' | 'work-photos' | 'blog'
 ): Promise<UploadResult> {
   try {
     // Validate file

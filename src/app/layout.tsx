@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast'
 import './globals.css'
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://havenhoney.co'),
   title: 'Haven & Honey | Making Homes Feel Loved',
   description: 'Haven & Honey offers meal prep, cleaning, and home reset services. We bring warmth, intention, faith, and care into busy families and overwhelmed hearts.',
   keywords: ['meal prep', 'cleaning services', 'home organization', 'home resets', 'family services', 'Haven & Honey'],

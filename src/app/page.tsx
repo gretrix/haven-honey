@@ -100,6 +100,7 @@ export default function Home() {
           <div className="flex items-center gap-6 sm:gap-10">
             <a href="#about" className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium">About</a>
             <a href="#services" className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium">Services</a>
+            <a href="/life-with-linda" className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium">Blog</a>
             <a href="/reviews" className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium">Reviews</a>
             <a href="/work" className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium">Work</a>
             <a href="#contact" className="btn-primary text-base py-3 px-6 sm:py-4 sm:px-8">Contact</a>
