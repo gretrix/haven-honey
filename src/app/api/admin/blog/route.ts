@@ -195,7 +195,12 @@ export async function PATCH(request: NextRequest) {
     for (const field of allowedFields) {
       if (updateFields[field] !== undefined) {
         updates.push(`${field} = ?`)
-        values.push(updateFields[field])
+        // Convert empty strings to null for datetime fields
+        if (field === 'scheduled_for' && updateFields[field] === '') {
+          values.push(null)
+        } else {
+          values.push(updateFields[field])
+        }
       }
     }
 
