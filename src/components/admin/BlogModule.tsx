@@ -119,10 +119,11 @@ export default function BlogModule() {
         
         // If there's a new featured image, upload it first
         if (featuredImage) {
+          console.log('Uploading new featured image...')
           const uploadFormData = new FormData()
           uploadFormData.append('featured_image', featuredImage)
           
-          const uploadResponse = await fetch('/api/admin/blog', {
+          const uploadResponse = await fetch('/api/admin/blog/upload', {
             method: 'POST',
             headers: {
               Authorization: `Bearer ${savedPassword}`,
@@ -131,6 +132,7 @@ export default function BlogModule() {
           })
           
           const uploadData = await uploadResponse.json()
+          console.log('Upload response:', uploadData)
           
           if (!uploadData.success) {
             toast.error(uploadData.error || 'Failed to upload image')
@@ -138,10 +140,12 @@ export default function BlogModule() {
             return
           }
           
-          featuredImageUrl = uploadData.post.featured_image_url
+          featuredImageUrl = uploadData.url
+          console.log('New image URL:', featuredImageUrl)
         }
         
         // Update post with all fields
+        console.log('Updating post with data:', { id: editingPost.id, ...formData, featured_image_url: featuredImageUrl })
         const response = await fetch('/api/admin/blog', {
           method: 'PATCH',
           headers: {
@@ -156,6 +160,7 @@ export default function BlogModule() {
         })
 
         const data = await response.json()
+        console.log('Update response:', data)
 
         if (data.success) {
           toast.success('Blog post updated!')

@@ -80,9 +80,22 @@ pm2 restart haven-honey
 - [ ] Verify paragraph breaks display correctly on public page
 - [ ] Check that drop cap still works on first paragraph
 
+## Additional Fix: 400 Error on Image Update
+
+**Issue**: When updating a blog post with a new image, got "400 Bad Request" error.
+
+**Root Cause**: The update logic was trying to use the POST endpoint (which requires title and content) to upload just the image.
+
+**Solution**: Created a dedicated `/api/admin/blog/upload` endpoint that:
+- Only handles image uploads
+- Doesn't require title/content
+- Returns just the image URL
+- Used by the update flow to upload new images before updating the post
+
 ## Files Changed
 - `src/components/admin/BlogModule.tsx` - Fixed image update logic + added visual feedback
 - `src/app/life-with-linda/[slug]/page.tsx` - Fixed paragraph formatting display
+- `src/app/api/admin/blog/upload/route.ts` - NEW: Dedicated image upload endpoint
 
 ---
 **Status**: Ready to deploy
