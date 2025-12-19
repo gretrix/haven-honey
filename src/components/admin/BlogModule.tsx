@@ -270,6 +270,12 @@ export default function BlogModule() {
       status: post.status,
       scheduled_for: post.scheduled_for || '',
     })
+    setFeaturedImage(null) // Reset featured image when editing
+    // Reset file input
+    const fileInput = document.getElementById('blog-featured-image') as HTMLInputElement
+    if (fileInput) {
+      fileInput.value = ''
+    }
     setShowAddModal(true)
   }
 
@@ -287,6 +293,11 @@ export default function BlogModule() {
     })
     setFeaturedImage(null)
     setEditingPost(null)
+    // Reset file input
+    const fileInput = document.getElementById('blog-featured-image') as HTMLInputElement
+    if (fileInput) {
+      fileInput.value = ''
+    }
   }
 
   // Auto-generate slug from title
@@ -416,25 +427,48 @@ export default function BlogModule() {
                 <label className="block text-sm font-medium text-brown mb-2">
                   Featured Image
                 </label>
+                
+                {/* Show current image if editing and no new image selected */}
+                {editingPost && editingPost.featured_image_url && !featuredImage && (
+                  <div className="mb-3 p-3 bg-cream-100 rounded-2xl">
+                    <p className="text-xs text-brown/60 mb-2">Current image:</p>
+                    <img
+                      src={`/api${editingPost.featured_image_url}`}
+                      alt="Current featured"
+                      className="w-32 h-32 object-cover rounded-xl"
+                    />
+                  </div>
+                )}
+                
                 <div className="relative">
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={(e) =>
-                      setFeaturedImage(e.target.files ? e.target.files[0] : null)
-                    }
+                    onChange={(e) => {
+                      const file = e.target.files ? e.target.files[0] : null
+                      setFeaturedImage(file)
+                      console.log('New image selected:', file?.name)
+                    }}
                     className="hidden"
                     id="blog-featured-image"
                   />
                   <label
                     htmlFor="blog-featured-image"
-                    className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-cream-100 border-2 border-dashed border-brown/30 rounded-2xl cursor-pointer hover:bg-cream-200 hover:border-brown/50 transition-colors"
+                    className={`flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed rounded-2xl cursor-pointer transition-colors ${
+                      featuredImage 
+                        ? 'bg-sage/10 border-sage text-sage-dark' 
+                        : 'bg-cream-100 border-brown/30 hover:bg-cream-200 hover:border-brown/50'
+                    }`}
                   >
-                    <svg className="w-5 h-5 text-brown/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <span className="text-brown/70">
-                      {featuredImage ? featuredImage.name : 'Choose featured image'}
+                    <span className={featuredImage ? 'font-medium' : 'text-brown/70'}>
+                      {featuredImage 
+                        ? `✓ ${featuredImage.name}` 
+                        : editingPost 
+                          ? 'Choose new featured image (optional)' 
+                          : 'Choose featured image'}
                     </span>
                   </label>
                 </div>

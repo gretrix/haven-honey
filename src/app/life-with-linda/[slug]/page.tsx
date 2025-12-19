@@ -237,30 +237,31 @@ export default function BlogPostPage() {
             className="prose prose-lg max-w-none"
           >
             <div
-              className="text-brown/90 leading-relaxed space-y-6"
+              className="text-brown/90 leading-relaxed"
               style={{
                 fontSize: '1.125rem',
                 lineHeight: '1.875rem',
                 fontFamily: 'Georgia, serif',
+                whiteSpace: 'pre-wrap',
               }}
             >
-              {post.content.split('\n').map((line, index) => {
-                // Empty line = paragraph break
-                if (line.trim() === '') {
-                  return <div key={index} className="h-4" />
+              {post.content.split('\n\n').map((paragraph, index) => {
+                // Skip empty paragraphs
+                if (paragraph.trim() === '') {
+                  return null
                 }
                 // First paragraph gets drop cap
                 if (index === 0) {
                   return (
-                    <p key={index} className="mb-4 first-letter:text-6xl first-letter:font-serif first-letter:text-brown first-letter:mr-2 first-letter:float-left first-letter:leading-[1]">
-                      {line}
+                    <p key={index} className="mb-6 first-letter:text-6xl first-letter:font-serif first-letter:text-brown first-letter:mr-2 first-letter:float-left first-letter:leading-[1]">
+                      {paragraph}
                     </p>
                   )
                 }
                 // Regular paragraphs
                 return (
-                  <p key={index} className="mb-4">
-                    {line}
+                  <p key={index} className="mb-6">
+                    {paragraph}
                   </p>
                 )
               })}
