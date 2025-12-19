@@ -40,3 +40,4 @@ echo "🌐 Website: https://havenhoney.co"
 echo "📊 Check logs: pm2 logs haven-honey"
 
 
+

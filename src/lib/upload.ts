@@ -4,7 +4,7 @@ import path from 'path'
 
 // Allowed image types
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif']
-const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+const MAX_FILE_SIZE = 15 * 1024 * 1024 // 15MB (increased for blog featured images)
 
 export interface UploadResult {
   success: boolean

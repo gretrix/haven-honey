@@ -83,6 +83,21 @@ export default function BlogModule() {
       return
     }
 
+    // Validate featured image if provided
+    if (featuredImage) {
+      const maxSize = 15 * 1024 * 1024 // 15MB
+      if (featuredImage.size > maxSize) {
+        toast.error(`Image is too large. Maximum size is ${maxSize / (1024 * 1024)}MB`)
+        return
+      }
+      
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif']
+      if (!allowedTypes.includes(featuredImage.type)) {
+        toast.error('Invalid image type. Please use JPG, PNG, WebP, or GIF')
+        return
+      }
+    }
+
     setUploading(true)
     const savedPassword = localStorage.getItem('admin_password')
 
@@ -136,12 +151,15 @@ export default function BlogModule() {
         const data = await response.json()
 
         if (data.success) {
-          toast.success('Blog post created!')
+          toast.success('✅ Blog post created!')
           setShowAddModal(false)
           resetForm()
           fetchPosts()
         } else {
-          toast.error(data.error || 'Failed to create blog post')
+          // Show detailed error message
+          const errorMsg = data.error || 'Failed to create blog post'
+          toast.error(errorMsg, { duration: 5000 })
+          console.error('Blog creation error:', data)
         }
       }
     } catch (error) {
@@ -701,4 +719,5 @@ export default function BlogModule() {
     </div>
   )
 }
+
 

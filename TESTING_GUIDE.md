@@ -393,3 +393,4 @@ If you encounter any issues during testing, check:
 3. MySQL error logs
 4. Network tab in dev tools for failed API requests
 
+

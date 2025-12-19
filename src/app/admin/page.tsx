@@ -7,8 +7,9 @@ import CRMModule from '@/components/admin/CRMModule'
 import ReviewsModule from '@/components/admin/ReviewsModule'
 import WorkPhotosModule from '@/components/admin/WorkPhotosModule'
 import BlogModule from '@/components/admin/BlogModule'
+import AuditLogsModule from '@/components/admin/AuditLogsModule'
 
-type TabType = 'crm' | 'reviews' | 'work-photos' | 'blog'
+type TabType = 'crm' | 'reviews' | 'work-photos' | 'blog' | 'audit-logs'
 
 export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -125,6 +126,16 @@ export default function AdminDashboard() {
             >
               📸 Work Photos
             </button>
+            <button
+              onClick={() => setActiveTab('audit-logs')}
+              className={`px-6 py-3 rounded-full text-sm font-medium transition-colors ${
+                activeTab === 'audit-logs'
+                  ? 'bg-brown text-cream-50'
+                  : 'bg-cream-100 text-brown hover:bg-cream-200'
+              }`}
+            >
+              📋 Audit Logs
+            </button>
           </div>
         </div>
 
@@ -139,6 +150,7 @@ export default function AdminDashboard() {
           {activeTab === 'blog' && <BlogModule />}
           {activeTab === 'reviews' && <ReviewsModule />}
           {activeTab === 'work-photos' && <WorkPhotosModule />}
+          {activeTab === 'audit-logs' && <AuditLogsModule />}
         </motion.div>
       </div>
     </div>

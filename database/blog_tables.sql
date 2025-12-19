@@ -68,3 +68,4 @@ CREATE TABLE IF NOT EXISTS blog_post_views (
     INDEX idx_viewed_at (viewed_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+

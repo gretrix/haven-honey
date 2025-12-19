@@ -3,3 +3,4 @@
 
 cd /home/ec2-user/haven-honey && mkdir -p public/uploads/{reviews,work-photos,blog} && sudo chown -R ec2-user:ec2-user public/uploads && chmod 755 public/uploads public/uploads/* && find public/uploads -type f -exec chmod 644 {} \; 2>/dev/null && git pull origin main && npm run build && pm2 restart haven-honey && echo "✅ DONE! Now test uploading an image in /admin"
 
+
