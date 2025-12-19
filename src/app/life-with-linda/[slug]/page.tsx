@@ -244,11 +244,26 @@ export default function BlogPostPage() {
                 fontFamily: 'Georgia, serif',
               }}
             >
-              {post.content.split('\n\n').map((paragraph, index) => (
-                <p key={index} className="mb-6 first-letter:text-6xl first-letter:font-serif first-letter:text-brown first-letter:mr-2 first-letter:float-left first-letter:leading-[1]">
-                  {paragraph}
-                </p>
-              ))}
+              {post.content.split('\n').map((line, index) => {
+                // Empty line = paragraph break
+                if (line.trim() === '') {
+                  return <div key={index} className="h-4" />
+                }
+                // First paragraph gets drop cap
+                if (index === 0) {
+                  return (
+                    <p key={index} className="mb-4 first-letter:text-6xl first-letter:font-serif first-letter:text-brown first-letter:mr-2 first-letter:float-left first-letter:leading-[1]">
+                      {line}
+                    </p>
+                  )
+                }
+                // Regular paragraphs
+                return (
+                  <p key={index} className="mb-4">
+                    {line}
+                  </p>
+                )
+              })}
             </div>
           </motion.div>
 

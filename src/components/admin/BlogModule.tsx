@@ -115,6 +115,33 @@ export default function BlogModule() {
 
       if (editingPost) {
         // Update existing post
+        let featuredImageUrl = editingPost.featured_image_url
+        
+        // If there's a new featured image, upload it first
+        if (featuredImage) {
+          const uploadFormData = new FormData()
+          uploadFormData.append('featured_image', featuredImage)
+          
+          const uploadResponse = await fetch('/api/admin/blog', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${savedPassword}`,
+            },
+            body: uploadFormData,
+          })
+          
+          const uploadData = await uploadResponse.json()
+          
+          if (!uploadData.success) {
+            toast.error(uploadData.error || 'Failed to upload image')
+            setUploading(false)
+            return
+          }
+          
+          featuredImageUrl = uploadData.post.featured_image_url
+        }
+        
+        // Update post with all fields
         const response = await fetch('/api/admin/blog', {
           method: 'PATCH',
           headers: {
@@ -124,6 +151,7 @@ export default function BlogModule() {
           body: JSON.stringify({
             id: editingPost.id,
             ...formData,
+            featured_image_url: featuredImageUrl,
           }),
         })
 
@@ -136,7 +164,7 @@ export default function BlogModule() {
           resetForm()
           fetchPosts()
         } else {
-          toast.error('Failed to update blog post')
+          toast.error(data.error || 'Failed to update blog post')
         }
       } else {
         // Create new post

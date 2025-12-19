@@ -232,7 +232,7 @@ export async function PATCH(request: NextRequest) {
 
     const allowedFields = [
       'title', 'slug', 'excerpt', 'content', 'category',
-      'meta_title', 'meta_description', 'status', 'scheduled_for'
+      'meta_title', 'meta_description', 'status', 'scheduled_for', 'featured_image_url'
     ]
 
     for (const field of allowedFields) {
