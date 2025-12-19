@@ -69,53 +69,78 @@ export async function GET(request: NextRequest) {
 
 // POST - Create new blog post
 export async function POST(request: NextRequest) {
+  console.log('=== BLOG POST START ===')
   try {
+    console.log('1. Checking auth...')
     if (!checkAuth(request)) {
+      console.log('AUTH FAILED')
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
+    console.log('AUTH OK')
 
+    console.log('2. Parsing form data...')
     const formData = await request.formData()
+    console.log('Form data parsed')
     
     const title = formData.get('title') as string
     const content = formData.get('content') as string
     
+    console.log('3. Title:', title)
+    console.log('4. Content length:', content?.length)
+    
     if (!title || !content) {
+      console.log('VALIDATION FAILED: Missing title or content')
       return NextResponse.json(
         { success: false, error: 'Title and content are required' },
         { status: 400 }
       )
     }
+    console.log('VALIDATION OK')
 
     // Generate slug from title
+    console.log('5. Generating slug...')
     let slug = formData.get('slug') as string || generateSlug(title)
+    console.log('Slug:', slug)
     
     // Check if slug already exists
+    console.log('6. Checking for existing slug...')
     const [existingPosts] = await pool.execute(
       'SELECT id FROM blog_posts WHERE slug = ?',
       [slug]
     )
     
     if ((existingPosts as any[]).length > 0) {
+      console.log('Slug exists, making unique...')
       // Add timestamp to make slug unique
       slug = `${slug}-${Date.now()}`
+      console.log('New slug:', slug)
     }
 
     // Handle featured image upload
+    console.log('7. Handling featured image...')
     let featuredImageUrl = null
     const featuredImage = formData.get('featured_image') as File
     
     if (featuredImage && featuredImage.size > 0) {
+      console.log('Featured image found, size:', featuredImage.size)
+      console.log('Featured image type:', featuredImage.type)
       const uploadResult = await saveUploadedFile(featuredImage, 'blog')
+      console.log('Upload result:', uploadResult)
       if (!uploadResult.success) {
+        console.log('UPLOAD FAILED:', uploadResult.error)
         return NextResponse.json(
           { success: false, error: uploadResult.error },
           { status: 400 }
         )
       }
       featuredImageUrl = uploadResult.url
+      console.log('Featured image uploaded:', featuredImageUrl)
+    } else {
+      console.log('No featured image or size is 0')
     }
 
     // Extract other fields
+    console.log('8. Extracting other fields...')
     const excerpt = formData.get('excerpt') as string
     const category = formData.get('category') as string || 'Life'
     const metaTitle = formData.get('meta_title') as string
@@ -123,24 +148,33 @@ export async function POST(request: NextRequest) {
     const status = formData.get('status') as string || 'draft'
     const scheduledFor = formData.get('scheduled_for') as string || null
 
+    console.log('Category:', category)
+    console.log('Status:', status)
+    console.log('Scheduled for:', scheduledFor)
+
     // Determine published_at
     let publishedAt = null
     if (status === 'published') {
       publishedAt = new Date().toISOString().slice(0, 19).replace('T', ' ')
+      console.log('Published at:', publishedAt)
     }
 
     // Insert into database
+    console.log('9. Inserting into database...')
     const [result] = await pool.execute(
       `INSERT INTO blog_posts 
        (title, slug, excerpt, content, featured_image_url, category, meta_title, meta_description, status, scheduled_for, published_at) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [title, slug, excerpt || null, content, featuredImageUrl, category, metaTitle || null, metaDescription || null, status, scheduledFor, publishedAt]
     )
+    console.log('Database insert successful')
 
     const insertResult = result as any
     const postId = insertResult.insertId
+    console.log('Post ID:', postId)
 
     // Log audit (skip if fails - don't block post creation)
+    console.log('10. Creating audit log...')
     try {
       await createAuditLog({
         action_type: 'create',
@@ -149,10 +183,13 @@ export async function POST(request: NextRequest) {
         details: `Created blog post: ${title}`,
         ip_address: getClientIp(request),
       })
+      console.log('Audit log created')
     } catch (auditError) {
-      console.error('Audit log error:', auditError)
+      console.error('Audit log error (non-blocking):', auditError)
     }
 
+    console.log('11. Returning success response')
+    console.log('=== BLOG POST SUCCESS ===')
     return NextResponse.json({
       success: true,
       post: {
@@ -162,9 +199,11 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error('Blog POST error:', error)
+    console.error('=== BLOG POST ERROR ===')
+    console.error('Error details:', error)
+    console.error('Error stack:', (error as Error).stack)
     return NextResponse.json(
-      { success: false, error: 'Failed to create blog post' },
+      { success: false, error: 'Failed to create blog post: ' + (error as Error).message },
       { status: 500 }
     )
   }
