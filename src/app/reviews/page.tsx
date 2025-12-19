@@ -254,23 +254,23 @@ export default function ReviewsPage() {
             onClick={() => setSelectedReview(null)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="relative max-w-4xl w-full bg-cream-50 rounded-3xl p-8 shadow-2xl"
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="relative max-w-3xl w-full bg-cream-50 rounded-3xl p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}
               <button
                 onClick={() => setSelectedReview(null)}
-                className="absolute top-4 right-4 w-10 h-10 bg-brown text-cream-50 rounded-full flex items-center justify-center hover:bg-brown/90 transition-colors text-2xl"
+                className="absolute top-4 right-4 w-10 h-10 bg-brown text-cream-50 rounded-full flex items-center justify-center hover:bg-brown/90 transition-colors text-2xl z-10"
               >
                 ×
               </button>
 
               {/* Featured Badge */}
               {selectedReview.is_featured && (
-                <div className="absolute -top-3 -right-3 bg-honey text-cream-50 px-4 py-2 rounded-full text-sm font-medium shadow-lg">
+                <div className="inline-block bg-honey text-cream-50 px-3 py-1 rounded-full text-xs font-medium shadow-md mb-4">
                   ⭐ Featured Review
                 </div>
               )}
@@ -280,24 +280,24 @@ export default function ReviewsPage() {
                 <img
                   src={`/api${selectedReview.screenshot_url}`}
                   alt={`Review from ${selectedReview.reviewer_name || 'Client'}`}
-                  className="w-full h-auto max-h-[60vh] object-contain"
+                  className="w-full h-auto max-h-[50vh] object-contain"
                 />
               </div>
 
               {/* Review Details */}
               <div className="text-center">
                 {selectedReview.star_rating && (
-                  <div className="text-honey text-2xl mb-3">
+                  <div className="text-honey text-xl sm:text-2xl mb-3">
                     {'⭐'.repeat(selectedReview.star_rating)}
                   </div>
                 )}
 
-                <h2 className="font-serif text-3xl text-brown mb-2">
+                <h2 className="font-serif text-2xl sm:text-3xl text-brown mb-2">
                   {selectedReview.reviewer_name || 'Anonymous'}
                 </h2>
 
                 {selectedReview.review_date && (
-                  <p className="text-brown/60 mb-3">
+                  <p className="text-brown/60 mb-3 text-sm sm:text-base">
                     {new Date(selectedReview.review_date).toLocaleDateString(
                       'en-US',
                       { year: 'numeric', month: 'long', day: 'numeric' }
@@ -305,12 +305,12 @@ export default function ReviewsPage() {
                   </p>
                 )}
 
-                <span className="inline-block text-sm px-4 py-2 bg-sage/20 text-sage-dark rounded-full mb-4">
+                <span className="inline-block text-xs sm:text-sm px-3 py-1 sm:px-4 sm:py-2 bg-sage/20 text-sage-dark rounded-full mb-4">
                   {selectedReview.tag}
                 </span>
 
                 {selectedReview.review_text && (
-                  <p className="text-brown/80 text-lg leading-relaxed mt-4 max-w-2xl mx-auto">
+                  <p className="text-brown/80 text-base sm:text-lg leading-relaxed mt-4">
                     {selectedReview.review_text}
                   </p>
                 )}
