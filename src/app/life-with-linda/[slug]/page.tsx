@@ -250,15 +250,7 @@ export default function BlogPostPage() {
                 if (paragraph.trim() === '') {
                   return null
                 }
-                // First paragraph gets drop cap
-                if (index === 0) {
-                  return (
-                    <p key={index} className="mb-6 first-letter:text-7xl first-letter:font-serif first-letter:text-brown first-letter:mr-3 first-letter:float-left first-letter:leading-[0.8] first-letter:mt-1">
-                      {paragraph}
-                    </p>
-                  )
-                }
-                // Regular paragraphs
+                // All paragraphs rendered the same (no drop cap)
                 return (
                   <p key={index} className="mb-6">
                     {paragraph}
