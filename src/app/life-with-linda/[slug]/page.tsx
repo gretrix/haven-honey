@@ -253,7 +253,7 @@ export default function BlogPostPage() {
                 // First paragraph gets drop cap
                 if (index === 0) {
                   return (
-                    <p key={index} className="mb-6 first-letter:text-6xl first-letter:font-serif first-letter:text-brown first-letter:mr-2 first-letter:float-left first-letter:leading-[1]">
+                    <p key={index} className="mb-6 first-letter:text-7xl first-letter:font-serif first-letter:text-brown first-letter:mr-3 first-letter:float-left first-letter:leading-[0.8] first-letter:mt-1">
                       {paragraph}
                     </p>
                   )

@@ -19,16 +19,22 @@ export default function AuditLogsModule() {
   const [loading, setLoading] = useState(false)
   const [filterAction, setFilterAction] = useState<string>('all')
   const [filterEntity, setFilterEntity] = useState<string>('all')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalLogs, setTotalLogs] = useState(0)
+  const logsPerPage = 20
 
   const actionTypes = ['all', 'create', 'update', 'delete', 'email_sent']
   const entityTypes = ['all', 'blog', 'review', 'work_photo', 'contact', 'email']
+
+  const totalPages = Math.ceil(totalLogs / logsPerPage)
 
   const fetchLogs = async () => {
     setLoading(true)
     const savedPassword = localStorage.getItem('admin_password')
 
     try {
-      let url = '/api/admin/audit-logs?limit=100'
+      const offset = (currentPage - 1) * logsPerPage
+      let url = `/api/admin/audit-logs?limit=${logsPerPage}&offset=${offset}`
       if (filterAction !== 'all') url += `&action_type=${filterAction}`
       if (filterEntity !== 'all') url += `&entity_type=${filterEntity}`
 
@@ -41,6 +47,7 @@ export default function AuditLogsModule() {
       const data = await response.json()
       if (data.success) {
         setLogs(data.logs)
+        setTotalLogs(data.total || data.logs.length)
       } else {
         toast.error('Failed to fetch audit logs')
       }
@@ -83,6 +90,11 @@ export default function AuditLogsModule() {
 
   useEffect(() => {
     fetchLogs()
+  }, [filterAction, filterEntity, currentPage])
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1)
   }, [filterAction, filterEntity])
 
   const exportToCSV = () => {
@@ -241,6 +253,92 @@ export default function AuditLogsModule() {
           </motion.div>
         ))}
       </div>
+
+      {/* Pagination */}
+      {!loading && totalPages > 1 && (
+        <div className="mt-8 flex items-center justify-center gap-2">
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="px-4 py-2 rounded-full bg-cream-50 text-brown hover:bg-cream-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow"
+          >
+            ← Previous
+          </button>
+
+          <div className="flex items-center gap-2">
+            {/* First page */}
+            {currentPage > 3 && (
+              <>
+                <button
+                  onClick={() => setCurrentPage(1)}
+                  className="w-10 h-10 rounded-full bg-cream-50 text-brown hover:bg-cream-100 transition-colors shadow"
+                >
+                  1
+                </button>
+                {currentPage > 4 && (
+                  <span className="text-brown/60 px-2">...</span>
+                )}
+              </>
+            )}
+
+            {/* Page numbers around current */}
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter((page) => {
+                return (
+                  page === currentPage ||
+                  page === currentPage - 1 ||
+                  page === currentPage + 1 ||
+                  page === currentPage - 2 ||
+                  page === currentPage + 2
+                )
+              })
+              .map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-10 h-10 rounded-full transition-colors shadow ${
+                    currentPage === page
+                      ? 'bg-brown text-cream-50'
+                      : 'bg-cream-50 text-brown hover:bg-cream-100'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+
+            {/* Last page */}
+            {currentPage < totalPages - 2 && (
+              <>
+                {currentPage < totalPages - 3 && (
+                  <span className="text-brown/60 px-2">...</span>
+                )}
+                <button
+                  onClick={() => setCurrentPage(totalPages)}
+                  className="w-10 h-10 rounded-full bg-cream-50 text-brown hover:bg-cream-100 transition-colors shadow"
+                >
+                  {totalPages}
+                </button>
+              </>
+            )}
+          </div>
+
+          <button
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 rounded-full bg-cream-50 text-brown hover:bg-cream-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow"
+          >
+            Next →
+          </button>
+        </div>
+      )}
+
+      {/* Page info */}
+      {!loading && totalLogs > 0 && (
+        <div className="mt-4 text-center text-sm text-brown/60">
+          Showing {(currentPage - 1) * logsPerPage + 1} to{' '}
+          {Math.min(currentPage * logsPerPage, totalLogs)} of {totalLogs} logs
+        </div>
+      )}
     </div>
   )
 }

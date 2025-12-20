@@ -18,31 +18,40 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const limit = parseInt(searchParams.get('limit') || '100')
+    const limit = parseInt(searchParams.get('limit') || '20')
+    const offset = parseInt(searchParams.get('offset') || '0')
     const action_type = searchParams.get('action_type')
     const entity_type = searchParams.get('entity_type')
     
-    let query = 'SELECT * FROM audit_logs WHERE 1=1'
+    // Build WHERE clause
+    let whereClause = 'WHERE 1=1'
     const params: any[] = []
 
     if (action_type && action_type !== 'all') {
-      query += ' AND action_type = ?'
+      whereClause += ' AND action_type = ?'
       params.push(action_type)
     }
 
     if (entity_type && entity_type !== 'all') {
-      query += ' AND entity_type = ?'
+      whereClause += ' AND entity_type = ?'
       params.push(entity_type)
     }
 
-    query += ' ORDER BY created_at DESC LIMIT ?'
-    params.push(limit)
+    // Get total count
+    const countQuery = `SELECT COUNT(*) as total FROM audit_logs ${whereClause}`
+    const [countRows] = await pool.execute(countQuery, params)
+    const total = (countRows as any[])[0].total
 
-    const [rows] = await pool.execute(query, params)
+    // Get paginated logs
+    const query = `SELECT * FROM audit_logs ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`
+    const [rows] = await pool.execute(query, [...params, limit, offset])
 
     return NextResponse.json({
       success: true,
       logs: rows,
+      total: total,
+      page: Math.floor(offset / limit) + 1,
+      perPage: limit,
     })
   } catch (error) {
     console.error('Audit logs GET error:', error)
