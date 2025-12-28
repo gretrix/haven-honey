@@ -78,6 +78,9 @@ const getConfirmationEmailHtml = (name: string) => `
               <p style="margin: 0; font-size: 12px; color: #E5D9C5;">
                 © ${new Date().getFullYear()} Haven & Honey. All rights reserved.
               </p>
+              <p style="margin: 4px 0 0; font-size: 9px; color: #4E3B32;">
+                AUTOMATED-EMAIL-FROM-WEBSITE
+              </p>
             </td>
           </tr>
           
@@ -201,7 +204,7 @@ export async function sendConfirmationEmail(to: string, name: string) {
     from: `"Haven & Honey" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
     to,
     subject: 'Thank You for Reaching Out! 🌿 - Haven & Honey',
-    html: '<!-- WEBSITE-EMAIL-NO-SIGNATURE -->' + getConfirmationEmailHtml(name),
+    html: getConfirmationEmailHtml(name),
   }
 
   await transporter.sendMail(mailOptions)
@@ -310,6 +313,9 @@ ${messageContent}
               <p style="margin: 8px 0 0; font-size: 11px; color: #E5D9C5;">
                 <a href="https://www.instagram.com/lifewithlindaaaa/" style="color: #D4A853; text-decoration: none;">@lifewithlindaaaa</a>
               </p>
+              <p style="margin: 4px 0 0; font-size: 9px; color: #4E3B32;">
+                AUTOMATED-EMAIL-FROM-WEBSITE
+              </p>
             </td>
           </tr>
           
@@ -325,7 +331,7 @@ ${messageContent}
     from: `"Haven & Honey" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
     to,
     subject,
-    html: '<!-- WEBSITE-EMAIL-NO-SIGNATURE -->' + html,
+    html,
     replyTo: process.env.LINDA_EMAIL || 'linda@havenhoney.co',
   }
 
