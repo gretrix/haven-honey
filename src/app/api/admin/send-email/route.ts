@@ -116,6 +116,9 @@ ${message}
               <p style="margin: 8px 0 0; font-size: 11px; color: #E5D9C5;">
                 <a href="https://www.instagram.com/lifewithlindaaaa/" style="color: #D4A853; text-decoration: none;">@lifewithlindaaaa</a>
               </p>
+              <p style="margin: 4px 0 0; font-size: 9px; color: #4E3B32;">
+                AUTOMATED-EMAIL-FROM-WEBSITE
+              </p>
             </td>
           </tr>
           
