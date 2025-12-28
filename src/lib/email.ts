@@ -201,7 +201,7 @@ export async function sendConfirmationEmail(to: string, name: string) {
     from: `"Haven & Honey" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
     to,
     subject: 'Thank You for Reaching Out! 🌿 - Haven & Honey',
-    html: getConfirmationEmailHtml(name),
+    html: '<!-- WEBSITE-EMAIL-NO-SIGNATURE -->' + getConfirmationEmailHtml(name),
   }
 
   await transporter.sendMail(mailOptions)
@@ -325,7 +325,7 @@ ${messageContent}
     from: `"Haven & Honey" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
     to,
     subject,
-    html,
+    html: '<!-- WEBSITE-EMAIL-NO-SIGNATURE -->' + html,
     replyTo: process.env.LINDA_EMAIL || 'linda@havenhoney.co',
   }
 
