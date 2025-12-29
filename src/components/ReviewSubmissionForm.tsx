@@ -52,14 +52,20 @@ export default function ReviewSubmissionForm() {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<ReviewFormData>({
     resolver: zodResolver(reviewSchema),
   })
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
+    const files = e.target.files
+    if (files && files.length > 0) {
+      const file = files[0]
+      
+      // Update form value
+      setValue('screenshot', files, { shouldValidate: true })
+      
       // Create preview
       const reader = new FileReader()
       reader.onloadend = () => {
@@ -264,7 +270,6 @@ export default function ReviewSubmissionForm() {
         </label>
         <div className="space-y-3">
           <input
-            {...register('screenshot')}
             type="file"
             id="screenshot"
             accept="image/*"
