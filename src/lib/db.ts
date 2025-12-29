@@ -108,6 +108,26 @@ export async function initializeDatabase() {
         INDEX idx_sent_at (sent_at)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `)
+
+    // Create review_submissions table (client-submitted reviews pending approval)
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS review_submissions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        reviewer_name VARCHAR(255) NOT NULL,
+        reviewer_email VARCHAR(255) NOT NULL,
+        star_rating INT NOT NULL CHECK (star_rating >= 1 AND star_rating <= 5),
+        service_category ENUM('Meal Prep', 'Cleaning', 'Organizing', 'Gift Wrapping', 'Matchmaking', 'Life Coaching', 'Other') NOT NULL,
+        review_text TEXT,
+        screenshot_url VARCHAR(500) NOT NULL,
+        status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+        admin_notes TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        reviewed_at TIMESTAMP NULL DEFAULT NULL,
+        INDEX idx_status (status),
+        INDEX idx_created_at (created_at),
+        INDEX idx_reviewer_email (reviewer_email)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `)
     
     console.log('Database tables initialized successfully')
   } finally {
@@ -155,6 +175,31 @@ export async function logEmailHistory(data: {
   const [result] = await pool.execute(
     'INSERT INTO email_history (contact_id, subject, message_body, status, error_message) VALUES (?, ?, ?, ?, ?)',
     [data.contact_id, data.subject, data.message_body, data.status, data.error_message || null]
+  )
+  return result
+}
+
+// Insert review submission (public form)
+export async function insertReviewSubmission(data: {
+  reviewer_name: string
+  reviewer_email: string
+  star_rating: number
+  service_category: string
+  review_text?: string
+  screenshot_url: string
+}) {
+  const [result] = await pool.execute(
+    `INSERT INTO review_submissions 
+     (reviewer_name, reviewer_email, star_rating, service_category, review_text, screenshot_url) 
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [
+      data.reviewer_name,
+      data.reviewer_email,
+      data.star_rating,
+      data.service_category,
+      data.review_text || null,
+      data.screenshot_url
+    ]
   )
   return result
 }

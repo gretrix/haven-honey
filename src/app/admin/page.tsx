@@ -5,11 +5,12 @@ import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import CRMModule from '@/components/admin/CRMModule'
 import ReviewsModule from '@/components/admin/ReviewsModule'
+import ReviewSubmissionsModule from '@/components/admin/ReviewSubmissionsModule'
 import WorkPhotosModule from '@/components/admin/WorkPhotosModule'
 import BlogModule from '@/components/admin/BlogModule'
 import AuditLogsModule from '@/components/admin/AuditLogsModule'
 
-type TabType = 'crm' | 'reviews' | 'work-photos' | 'blog' | 'audit-logs'
+type TabType = 'crm' | 'reviews' | 'review-submissions' | 'work-photos' | 'blog' | 'audit-logs'
 
 export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -117,6 +118,16 @@ export default function AdminDashboard() {
               ⭐ Reviews
             </button>
             <button
+              onClick={() => setActiveTab('review-submissions')}
+              className={`px-6 py-3 rounded-full text-sm font-medium transition-colors ${
+                activeTab === 'review-submissions'
+                  ? 'bg-brown text-cream-50'
+                  : 'bg-cream-100 text-brown hover:bg-cream-200'
+              }`}
+            >
+              📝 Review Submissions
+            </button>
+            <button
               onClick={() => setActiveTab('work-photos')}
               className={`px-6 py-3 rounded-full text-sm font-medium transition-colors ${
                 activeTab === 'work-photos'
@@ -149,6 +160,7 @@ export default function AdminDashboard() {
           {activeTab === 'crm' && <CRMModule />}
           {activeTab === 'blog' && <BlogModule />}
           {activeTab === 'reviews' && <ReviewsModule />}
+          {activeTab === 'review-submissions' && <ReviewSubmissionsModule />}
           {activeTab === 'work-photos' && <WorkPhotosModule />}
           {activeTab === 'audit-logs' && <AuditLogsModule />}
         </motion.div>

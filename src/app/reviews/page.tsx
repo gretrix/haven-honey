@@ -95,6 +95,12 @@ export default function ReviewsPage() {
               My Work
             </Link>
             <Link
+              href="/submit-review"
+              className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium"
+            >
+              Submit Review
+            </Link>
+            <Link
               href="/#contact"
               className="btn-primary text-base py-3 px-6 sm:py-4 sm:px-8"
             >
@@ -151,6 +157,31 @@ export default function ReviewsPage() {
                 </button>
               ))}
             </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* CTA Section - Submit Your Review */}
+      <section className="px-6 pb-16">
+        <div className="max-w-3xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-gradient-to-br from-sage/10 to-honey/10 rounded-3xl p-8 sm:p-12 border border-sage/20 text-center"
+          >
+            <h3 className="font-serif text-3xl text-brown mb-4">
+              Have You Worked With Us?
+            </h3>
+            <p className="text-brown/70 text-lg mb-6 max-w-2xl mx-auto">
+              Share your experience! Upload a screenshot of your review and help others discover the Haven & Honey difference.
+            </p>
+            <Link
+              href="/submit-review"
+              className="btn-primary inline-block"
+            >
+              ⭐ Submit Your Review
+            </Link>
           </motion.div>
         </div>
       </section>
@@ -359,6 +390,7 @@ export default function ReviewsPage() {
     </main>
   )
 }
+
 
 
 
