@@ -26,7 +26,17 @@ const reviewSchema = z.object({
   star_rating: z.string().min(1, 'Please select a rating'),
   service_category: z.string().min(1, 'Please select a service category'),
   review_text: z.string().optional(),
-  screenshot: z.any().refine((files) => files && files.length > 0, 'Please upload a screenshot'),
+  screenshot: z.any().refine(
+    (files) => {
+      // Check if files exist and has at least one file
+      if (!files) return false
+      if (typeof files === 'object' && 'length' in files) {
+        return files.length > 0
+      }
+      return false
+    },
+    'Please upload a screenshot'
+  ),
 })
 
 type ReviewFormData = z.infer<typeof reviewSchema>
