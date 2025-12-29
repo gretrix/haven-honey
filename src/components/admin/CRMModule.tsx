@@ -39,6 +39,46 @@ export default function CRMModule() {
   const [individualMessage, setIndividualMessage] = useState('')
   const [emailHistory, setEmailHistory] = useState<EmailHistory[]>([])
   const [loadingHistory, setLoadingHistory] = useState(false)
+  
+  // Image upload states
+  const [massEmailImage, setMassEmailImage] = useState<File | null>(null)
+  const [massEmailImagePreview, setMassEmailImagePreview] = useState<string | null>(null)
+  const [individualEmailImage, setIndividualEmailImage] = useState<File | null>(null)
+  const [individualEmailImagePreview, setIndividualEmailImagePreview] = useState<string | null>(null)
+
+  // Handle image upload for mass email
+  const handleMassEmailImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast.error('Image must be less than 5MB')
+        return
+      }
+      setMassEmailImage(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setMassEmailImagePreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  // Handle image upload for individual email
+  const handleIndividualEmailImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast.error('Image must be less than 5MB')
+        return
+      }
+      setIndividualEmailImage(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setIndividualEmailImagePreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
 
   const fetchSubmissions = async () => {
     setLoading(true)
@@ -135,6 +175,8 @@ export default function CRMModule() {
     setSelectedContact(contact)
     setIndividualSubject('')
     setIndividualMessage('')
+    setIndividualEmailImage(null)
+    setIndividualEmailImagePreview(null)
     setShowIndividualEmail(true)
     
     // Fetch email history
@@ -169,6 +211,16 @@ export default function CRMModule() {
     const savedPassword = localStorage.getItem('admin_password')
 
     try {
+      // Convert image to base64 if present
+      let imageData = null
+      if (individualEmailImage) {
+        const reader = new FileReader()
+        imageData = await new Promise<string>((resolve) => {
+          reader.onloadend = () => resolve(reader.result as string)
+          reader.readAsDataURL(individualEmailImage)
+        })
+      }
+
       const response = await fetch('/api/admin/send-email', {
         method: 'POST',
         headers: {
@@ -181,6 +233,7 @@ export default function CRMModule() {
           to_name: selectedContact.name,
           subject: individualSubject,
           message: individualMessage,
+          image: imageData,
         }),
       })
 
@@ -191,6 +244,8 @@ export default function CRMModule() {
         setShowIndividualEmail(false)
         setIndividualSubject('')
         setIndividualMessage('')
+        setIndividualEmailImage(null)
+        setIndividualEmailImagePreview(null)
       } else {
         toast.error(data.error || 'Failed to send email')
       }
@@ -250,6 +305,16 @@ export default function CRMModule() {
     const savedPassword = localStorage.getItem('admin_password')
 
     try {
+      // Convert image to base64 if present
+      let imageData = null
+      if (massEmailImage) {
+        const reader = new FileReader()
+        imageData = await new Promise<string>((resolve) => {
+          reader.onloadend = () => resolve(reader.result as string)
+          reader.readAsDataURL(massEmailImage)
+        })
+      }
+
       const response = await fetch('/api/admin/mass-email', {
         method: 'POST',
         headers: {
@@ -261,6 +326,7 @@ export default function CRMModule() {
           message: emailMessage,
           recipientIds: selectedIds.length > 0 ? selectedIds : undefined,
           sendToAll: selectedIds.length === 0,
+          image: imageData,
         }),
       })
 
@@ -271,6 +337,8 @@ export default function CRMModule() {
         setShowMassEmail(false)
         setEmailSubject('')
         setEmailMessage('')
+        setMassEmailImage(null)
+        setMassEmailImagePreview(null)
         setSelectedIds([])
       } else {
         toast.error(data.error || 'Failed to send emails')
@@ -420,6 +488,38 @@ export default function CRMModule() {
                 />
               </div>
 
+              <div>
+                <label className="block text-sm font-medium text-brown mb-2">
+                  Attach Image (Optional)
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleMassEmailImageChange}
+                  className="form-input"
+                  disabled={sendingEmail}
+                />
+                {massEmailImagePreview && (
+                  <div className="mt-3 relative">
+                    <img
+                      src={massEmailImagePreview}
+                      alt="Preview"
+                      className="max-w-full h-auto rounded-lg max-h-64 object-contain"
+                    />
+                    <button
+                      onClick={() => {
+                        setMassEmailImage(null)
+                        setMassEmailImagePreview(null)
+                      }}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                      disabled={sendingEmail}
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <div className="flex gap-3">
                 <button
                   onClick={sendMassEmail}
@@ -491,6 +591,38 @@ export default function CRMModule() {
                   rows={8}
                   disabled={sendingEmail}
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-brown mb-2">
+                  Attach Image (Optional)
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleIndividualEmailImageChange}
+                  className="form-input"
+                  disabled={sendingEmail}
+                />
+                {individualEmailImagePreview && (
+                  <div className="mt-3 relative">
+                    <img
+                      src={individualEmailImagePreview}
+                      alt="Preview"
+                      className="max-w-full h-auto rounded-lg max-h-64 object-contain"
+                    />
+                    <button
+                      onClick={() => {
+                        setIndividualEmailImage(null)
+                        setIndividualEmailImagePreview(null)
+                      }}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                      disabled={sendingEmail}
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Email History */}
@@ -659,5 +791,6 @@ export default function CRMModule() {
     </div>
   )
 }
+
 
 

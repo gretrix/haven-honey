@@ -67,3 +67,4 @@ echo "2. Check if image displays on /reviews"
 echo "3. If still broken, check logs: pm2 logs haven-honey"
 
 
+

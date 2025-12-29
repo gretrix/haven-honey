@@ -233,3 +233,4 @@ sudo systemctl reload nginx
 **Once images are working, you're all set! ✅**
 
 
+

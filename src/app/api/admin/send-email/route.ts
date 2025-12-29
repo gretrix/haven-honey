@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { contact_id, to_email, to_name, subject, message } = body
+    const { contact_id, to_email, to_name, subject, message, image } = body
 
     if (!contact_id || !to_email || !subject || !message) {
       return NextResponse.json(
@@ -46,7 +46,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create email HTML
+    // Create email HTML with optional image
+    const imageHtml = image
+      ? `
+          <!-- Image -->
+          <tr>
+            <td align="center" style="padding: 20px 40px;">
+              <img src="${image}" alt="Email attachment" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 2px 8px rgba(78, 59, 50, 0.1);" />
+            </td>
+          </tr>
+      `
+      : ''
+
     const emailHtml = `
 <!DOCTYPE html>
 <html>
@@ -92,6 +103,7 @@ ${message}
               </p>
             </td>
           </tr>
+          ${imageHtml}
           
           <!-- Quote -->
           <tr>
@@ -220,5 +232,6 @@ export async function GET(request: NextRequest) {
     )
   }
 }
+
 
 

@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { subject, message, recipientIds, sendToAll } = body
+    const { subject, message, recipientIds, sendToAll, image } = body
 
     if (!subject || !message) {
       return NextResponse.json(
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     // Send emails
     const results = await Promise.allSettled(
       recipients.map((recipient) =>
-        sendMassEmail(recipient.email, recipient.name, subject, message)
+        sendMassEmail(recipient.email, recipient.name, subject, message, image)
       )
     )
 
@@ -71,5 +71,6 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
 
 

@@ -233,8 +233,20 @@ export async function sendMassEmail(
   to: string,
   recipientName: string,
   subject: string,
-  messageContent: string
+  messageContent: string,
+  imageData?: string | null
 ) {
+  const imageHtml = imageData
+    ? `
+          <!-- Image -->
+          <tr>
+            <td align="center" style="padding: 20px 40px;">
+              <img src="${imageData}" alt="Email attachment" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 2px 8px rgba(78, 59, 50, 0.1);" />
+            </td>
+          </tr>
+    `
+    : ''
+
   const html = `
 <!DOCTYPE html>
 <html>
@@ -280,6 +292,7 @@ ${messageContent}
               </p>
             </td>
           </tr>
+          ${imageHtml}
           
           <!-- CTA -->
           <tr>
