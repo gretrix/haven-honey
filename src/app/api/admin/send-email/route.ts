@@ -46,13 +46,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create email HTML with optional image
+    // Create email HTML with optional image (using CID for embedded images)
     const imageHtml = image
       ? `
           <!-- Image -->
           <tr>
             <td align="center" style="padding: 20px 40px;">
-              <img src="${image}" alt="Email attachment" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 2px 8px rgba(78, 59, 50, 0.1);" />
+              <img src="cid:emailImage" alt="Email attachment" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 2px 8px rgba(78, 59, 50, 0.1);" />
             </td>
           </tr>
       `
@@ -146,14 +146,37 @@ ${message}
     let errorMessage: string | undefined
 
     try {
-      // Send email
-      await transporter.sendMail({
+      // Prepare email options
+      const mailOptions: any = {
         from: `"Haven & Honey - Linda" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
         to: to_email,
         subject,
         html: emailHtml,
         replyTo: process.env.LINDA_EMAIL || 'linda@havenhoney.co',
-      })
+      }
+
+      // Add image as CID attachment if present
+      if (image) {
+        // Extract base64 data and mime type from data URL
+        const matches = image.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
+        if (matches && matches.length === 3) {
+          const mimeType = matches[1]
+          const base64Data = matches[2]
+          
+          mailOptions.attachments = [
+            {
+              filename: 'image.jpg',
+              content: base64Data,
+              encoding: 'base64',
+              cid: 'emailImage', // Same CID used in the img src
+              contentType: mimeType,
+            },
+          ]
+        }
+      }
+
+      // Send email
+      await transporter.sendMail(mailOptions)
     } catch (emailError: any) {
       emailStatus = 'failed'
       errorMessage = emailError.message

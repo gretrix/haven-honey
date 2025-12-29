@@ -46,10 +46,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Send emails
+    // Send emails with image data
     const results = await Promise.allSettled(
       recipients.map((recipient) =>
-        sendMassEmail(recipient.email, recipient.name, subject, message, image)
+        sendMassEmail(recipient.email, recipient.name, subject, message, image || null)
       )
     )
 
