@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
 
     // Upload screenshot
     const uploadResult = await saveUploadedFile(screenshot, 'reviews')
-    if (!uploadResult.success) {
+    if (!uploadResult.success || !uploadResult.url) {
       return NextResponse.json(
         { success: false, error: uploadResult.error || 'Failed to upload screenshot' },
         { status: 400 }
