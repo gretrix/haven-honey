@@ -157,9 +157,13 @@ export async function PATCH(request: NextRequest) {
       if (updateFields[field] !== undefined) {
         let value = updateFields[field]
         
-        // Convert date to MySQL DATE format (YYYY-MM-DD)
-        if (field === 'review_date' && value) {
-          value = new Date(value).toISOString().split('T')[0]
+        // Convert date to MySQL DATE format (YYYY-MM-DD), or null if empty
+        if (field === 'review_date') {
+          if (value && value !== '') {
+            value = new Date(value).toISOString().split('T')[0]
+          } else {
+            value = null
+          }
         }
         
         updates.push(`${field} = ?`)
