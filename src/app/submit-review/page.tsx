@@ -6,6 +6,9 @@ import Link from 'next/link'
 import ReviewSubmissionForm from '@/components/ReviewSubmissionForm'
 import ReCaptchaProvider from '@/components/ReCaptchaProvider'
 
+// Force dynamic rendering since this page uses browser-only APIs
+export const dynamic = 'force-dynamic'
+
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0 },
