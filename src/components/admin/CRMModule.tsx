@@ -40,44 +40,112 @@ export default function CRMModule() {
   const [emailHistory, setEmailHistory] = useState<EmailHistory[]>([])
   const [loadingHistory, setLoadingHistory] = useState(false)
   
-  // Image upload states
-  const [massEmailImage, setMassEmailImage] = useState<File | null>(null)
-  const [massEmailImagePreview, setMassEmailImagePreview] = useState<string | null>(null)
-  const [individualEmailImage, setIndividualEmailImage] = useState<File | null>(null)
-  const [individualEmailImagePreview, setIndividualEmailImagePreview] = useState<string | null>(null)
+  // Image upload states - now supporting multiple images
+  const [massEmailImages, setMassEmailImages] = useState<File[]>([])
+  const [massEmailImagePreviews, setMassEmailImagePreviews] = useState<string[]>([])
+  const [individualEmailImages, setIndividualEmailImages] = useState<File[]>([])
+  const [individualEmailImagePreviews, setIndividualEmailImagePreviews] = useState<string[]>([])
 
-  // Handle image upload for mass email
+  // Handle multiple image uploads for mass email
   const handleMassEmailImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        toast.error('Image must be less than 5MB')
+    const files = Array.from(e.target.files || [])
+    
+    if (files.length === 0) return
+    
+    // Check if adding these files would exceed 5 images
+    if (massEmailImages.length + files.length > 5) {
+      toast.error('Maximum 5 images allowed')
+      return
+    }
+    
+    // Validate each file
+    const validFiles: File[] = []
+    const newPreviews: string[] = []
+    
+    files.forEach(file => {
+      if (file.size > 15 * 1024 * 1024) {
+        toast.error(`${file.name} is too large (max 15MB)`)
         return
       }
-      setMassEmailImage(file)
+      if (!file.type.startsWith('image/')) {
+        toast.error(`${file.name} is not an image`)
+        return
+      }
+      validFiles.push(file)
+    })
+    
+    // Read all valid files
+    validFiles.forEach(file => {
       const reader = new FileReader()
       reader.onloadend = () => {
-        setMassEmailImagePreview(reader.result as string)
+        newPreviews.push(reader.result as string)
+        if (newPreviews.length === validFiles.length) {
+          setMassEmailImages(prev => [...prev, ...validFiles])
+          setMassEmailImagePreviews(prev => [...prev, ...newPreviews])
+        }
       }
       reader.readAsDataURL(file)
-    }
+    })
+    
+    // Reset input
+    e.target.value = ''
   }
 
-  // Handle image upload for individual email
+  // Handle multiple image uploads for individual email
   const handleIndividualEmailImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        toast.error('Image must be less than 5MB')
+    const files = Array.from(e.target.files || [])
+    
+    if (files.length === 0) return
+    
+    // Check if adding these files would exceed 5 images
+    if (individualEmailImages.length + files.length > 5) {
+      toast.error('Maximum 5 images allowed')
+      return
+    }
+    
+    // Validate each file
+    const validFiles: File[] = []
+    const newPreviews: string[] = []
+    
+    files.forEach(file => {
+      if (file.size > 15 * 1024 * 1024) {
+        toast.error(`${file.name} is too large (max 15MB)`)
         return
       }
-      setIndividualEmailImage(file)
+      if (!file.type.startsWith('image/')) {
+        toast.error(`${file.name} is not an image`)
+        return
+      }
+      validFiles.push(file)
+    })
+    
+    // Read all valid files
+    validFiles.forEach(file => {
       const reader = new FileReader()
       reader.onloadend = () => {
-        setIndividualEmailImagePreview(reader.result as string)
+        newPreviews.push(reader.result as string)
+        if (newPreviews.length === validFiles.length) {
+          setIndividualEmailImages(prev => [...prev, ...validFiles])
+          setIndividualEmailImagePreviews(prev => [...prev, ...newPreviews])
+        }
       }
       reader.readAsDataURL(file)
-    }
+    })
+    
+    // Reset input
+    e.target.value = ''
+  }
+
+  // Remove image from mass email
+  const removeMassEmailImage = (index: number) => {
+    setMassEmailImages(prev => prev.filter((_, i) => i !== index))
+    setMassEmailImagePreviews(prev => prev.filter((_, i) => i !== index))
+  }
+
+  // Remove image from individual email
+  const removeIndividualEmailImage = (index: number) => {
+    setIndividualEmailImages(prev => prev.filter((_, i) => i !== index))
+    setIndividualEmailImagePreviews(prev => prev.filter((_, i) => i !== index))
   }
 
   const fetchSubmissions = async () => {
@@ -175,8 +243,8 @@ export default function CRMModule() {
     setSelectedContact(contact)
     setIndividualSubject('')
     setIndividualMessage('')
-    setIndividualEmailImage(null)
-    setIndividualEmailImagePreview(null)
+    setIndividualEmailImages([])
+    setIndividualEmailImagePreviews([])
     setShowIndividualEmail(true)
     
     // Fetch email history
@@ -211,14 +279,17 @@ export default function CRMModule() {
     const savedPassword = localStorage.getItem('admin_password')
 
     try {
-      // Convert image to base64 if present
-      let imageData = null
-      if (individualEmailImage) {
-        const reader = new FileReader()
-        imageData = await new Promise<string>((resolve) => {
-          reader.onloadend = () => resolve(reader.result as string)
-          reader.readAsDataURL(individualEmailImage)
-        })
+      // Convert images to base64 array if present
+      const imageDataArray: string[] = []
+      if (individualEmailImages.length > 0) {
+        for (const file of individualEmailImages) {
+          const reader = new FileReader()
+          const imageData = await new Promise<string>((resolve) => {
+            reader.onloadend = () => resolve(reader.result as string)
+            reader.readAsDataURL(file)
+          })
+          imageDataArray.push(imageData)
+        }
       }
 
       const response = await fetch('/api/admin/send-email', {
@@ -233,7 +304,7 @@ export default function CRMModule() {
           to_name: selectedContact.name,
           subject: individualSubject,
           message: individualMessage,
-          image: imageData,
+          images: imageDataArray,
         }),
       })
 
@@ -244,8 +315,8 @@ export default function CRMModule() {
         setShowIndividualEmail(false)
         setIndividualSubject('')
         setIndividualMessage('')
-        setIndividualEmailImage(null)
-        setIndividualEmailImagePreview(null)
+        setIndividualEmailImages([])
+        setIndividualEmailImagePreviews([])
       } else {
         toast.error(data.error || 'Failed to send email')
       }
@@ -305,14 +376,17 @@ export default function CRMModule() {
     const savedPassword = localStorage.getItem('admin_password')
 
     try {
-      // Convert image to base64 if present
-      let imageData = null
-      if (massEmailImage) {
-        const reader = new FileReader()
-        imageData = await new Promise<string>((resolve) => {
-          reader.onloadend = () => resolve(reader.result as string)
-          reader.readAsDataURL(massEmailImage)
-        })
+      // Convert images to base64 array if present
+      const imageDataArray: string[] = []
+      if (massEmailImages.length > 0) {
+        for (const file of massEmailImages) {
+          const reader = new FileReader()
+          const imageData = await new Promise<string>((resolve) => {
+            reader.onloadend = () => resolve(reader.result as string)
+            reader.readAsDataURL(file)
+          })
+          imageDataArray.push(imageData)
+        }
       }
 
       const response = await fetch('/api/admin/mass-email', {
@@ -326,7 +400,7 @@ export default function CRMModule() {
           message: emailMessage,
           recipientIds: selectedIds.length > 0 ? selectedIds : undefined,
           sendToAll: selectedIds.length === 0,
-          image: imageData,
+          images: imageDataArray,
         }),
       })
 
@@ -337,8 +411,8 @@ export default function CRMModule() {
         setShowMassEmail(false)
         setEmailSubject('')
         setEmailMessage('')
-        setMassEmailImage(null)
-        setMassEmailImagePreview(null)
+        setMassEmailImages([])
+        setMassEmailImagePreviews([])
         setSelectedIds([])
       } else {
         toast.error(data.error || 'Failed to send emails')
@@ -490,32 +564,65 @@ export default function CRMModule() {
 
               <div>
                 <label className="block text-sm font-medium text-brown mb-2">
-                  Attach Image (Optional)
+                  Attach Images (Optional)
                 </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleMassEmailImageChange}
-                  className="form-input"
-                  disabled={sendingEmail}
-                />
-                {massEmailImagePreview && (
-                  <div className="mt-3 relative">
-                    <img
-                      src={massEmailImagePreview}
-                      alt="Preview"
-                      className="max-w-full h-auto rounded-lg max-h-64 object-contain"
-                    />
-                    <button
-                      onClick={() => {
-                        setMassEmailImage(null)
-                        setMassEmailImagePreview(null)
-                      }}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
-                      disabled={sendingEmail}
-                    >
-                      ×
-                    </button>
+                <p className="text-xs text-brown/60 mb-2">
+                  Upload up to 5 images (max 15MB each)
+                </p>
+                
+                {/* Image Upload Button */}
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleMassEmailImageChange}
+                    className="hidden"
+                    id="mass-email-image-upload"
+                    disabled={sendingEmail || massEmailImages.length >= 5}
+                  />
+                  <label
+                    htmlFor="mass-email-image-upload"
+                    className={`flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-xl cursor-pointer transition-all ${
+                      massEmailImages.length >= 5
+                        ? 'border-brown/20 bg-cream-100 cursor-not-allowed'
+                        : 'border-brown/30 hover:border-brown/50 hover:bg-cream-100'
+                    }`}
+                  >
+                    <span className="text-2xl">📷</span>
+                    <span className="text-sm font-medium text-brown">
+                      {massEmailImages.length >= 5
+                        ? 'Maximum images reached'
+                        : massEmailImages.length > 0
+                        ? `Add more images (${massEmailImages.length}/5)`
+                        : 'Click to upload images'}
+                    </span>
+                  </label>
+                </div>
+
+                {/* Image Previews */}
+                {massEmailImagePreviews.length > 0 && (
+                  <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {massEmailImagePreviews.map((preview, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={preview}
+                          alt={`Preview ${index + 1}`}
+                          className="w-full h-32 object-cover rounded-lg border-2 border-brown/10"
+                        />
+                        <button
+                          onClick={() => removeMassEmailImage(index)}
+                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                          disabled={sendingEmail}
+                          type="button"
+                        >
+                          ×
+                        </button>
+                        <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                          {index + 1}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -595,32 +702,65 @@ export default function CRMModule() {
 
               <div>
                 <label className="block text-sm font-medium text-brown mb-2">
-                  Attach Image (Optional)
+                  Attach Images (Optional)
                 </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleIndividualEmailImageChange}
-                  className="form-input"
-                  disabled={sendingEmail}
-                />
-                {individualEmailImagePreview && (
-                  <div className="mt-3 relative">
-                    <img
-                      src={individualEmailImagePreview}
-                      alt="Preview"
-                      className="max-w-full h-auto rounded-lg max-h-64 object-contain"
-                    />
-                    <button
-                      onClick={() => {
-                        setIndividualEmailImage(null)
-                        setIndividualEmailImagePreview(null)
-                      }}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
-                      disabled={sendingEmail}
-                    >
-                      ×
-                    </button>
+                <p className="text-xs text-brown/60 mb-2">
+                  Upload up to 5 images (max 15MB each)
+                </p>
+                
+                {/* Image Upload Button */}
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleIndividualEmailImageChange}
+                    className="hidden"
+                    id="individual-email-image-upload"
+                    disabled={sendingEmail || individualEmailImages.length >= 5}
+                  />
+                  <label
+                    htmlFor="individual-email-image-upload"
+                    className={`flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-xl cursor-pointer transition-all ${
+                      individualEmailImages.length >= 5
+                        ? 'border-brown/20 bg-cream-100 cursor-not-allowed'
+                        : 'border-brown/30 hover:border-brown/50 hover:bg-cream-100'
+                    }`}
+                  >
+                    <span className="text-2xl">📷</span>
+                    <span className="text-sm font-medium text-brown">
+                      {individualEmailImages.length >= 5
+                        ? 'Maximum images reached'
+                        : individualEmailImages.length > 0
+                        ? `Add more images (${individualEmailImages.length}/5)`
+                        : 'Click to upload images'}
+                    </span>
+                  </label>
+                </div>
+
+                {/* Image Previews */}
+                {individualEmailImagePreviews.length > 0 && (
+                  <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {individualEmailImagePreviews.map((preview, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={preview}
+                          alt={`Preview ${index + 1}`}
+                          className="w-full h-32 object-cover rounded-lg border-2 border-brown/10"
+                        />
+                        <button
+                          onClick={() => removeIndividualEmailImage(index)}
+                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                          disabled={sendingEmail}
+                          type="button"
+                        >
+                          ×
+                        </button>
+                        <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                          {index + 1}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>

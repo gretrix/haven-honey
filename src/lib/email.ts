@@ -234,19 +234,20 @@ export async function sendMassEmail(
   recipientName: string,
   subject: string,
   messageContent: string,
-  imageData?: string | null
+  imageDataArray?: string[]
 ) {
   // Use CID (Content-ID) for embedded images instead of base64 data URLs
-  const imageHtml = imageData
-    ? `
-          <!-- Image -->
+  let imageHtml = ''
+  if (imageDataArray && imageDataArray.length > 0) {
+    imageHtml = imageDataArray.map((_, index) => `
+          <!-- Image ${index + 1} -->
           <tr>
             <td align="center" style="padding: 20px 40px;">
-              <img src="cid:emailImage" alt="Email attachment" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 2px 8px rgba(78, 59, 50, 0.1);" />
+              <img src="cid:emailImage${index}" alt="Email attachment ${index + 1}" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 2px 8px rgba(78, 59, 50, 0.1);" />
             </td>
           </tr>
-    `
-    : ''
+    `).join('')
+  }
 
   const html = `
 <!DOCTYPE html>
@@ -349,24 +350,25 @@ ${messageContent}
     replyTo: process.env.LINDA_EMAIL || 'linda@havenhoney.co',
   }
 
-  // Add image as CID attachment if present
-  if (imageData) {
-    // Extract base64 data and mime type from data URL
-    const matches = imageData.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
-    if (matches && matches.length === 3) {
-      const mimeType = matches[1]
-      const base64Data = matches[2]
-      
-      mailOptions.attachments = [
-        {
-          filename: 'image.jpg',
+  // Add images as CID attachments if present
+  if (imageDataArray && imageDataArray.length > 0) {
+    mailOptions.attachments = imageDataArray.map((imageData, index) => {
+      // Extract base64 data and mime type from data URL
+      const matches = imageData.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
+      if (matches && matches.length === 3) {
+        const mimeType = matches[1]
+        const base64Data = matches[2]
+        
+        return {
+          filename: `image${index + 1}.jpg`,
           content: base64Data,
           encoding: 'base64',
-          cid: 'emailImage', // Same CID used in the img src
+          cid: `emailImage${index}`, // Same CID used in the img src
           contentType: mimeType,
-        },
-      ]
-    }
+        }
+      }
+      return null
+    }).filter(Boolean)
   }
 
   await transporter.sendMail(mailOptions)

@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { contact_id, to_email, to_name, subject, message, image } = body
+    const { contact_id, to_email, to_name, subject, message, images } = body
 
     if (!contact_id || !to_email || !subject || !message) {
       return NextResponse.json(
@@ -46,17 +46,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create email HTML with optional image (using CID for embedded images)
-    const imageHtml = image
-      ? `
-          <!-- Image -->
+    // Create email HTML with optional multiple images (using CID for embedded images)
+    let imageHtml = ''
+    if (images && Array.isArray(images) && images.length > 0) {
+      imageHtml = images.map((_, index) => `
+          <!-- Image ${index + 1} -->
           <tr>
             <td align="center" style="padding: 20px 40px;">
-              <img src="cid:emailImage" alt="Email attachment" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 2px 8px rgba(78, 59, 50, 0.1);" />
+              <img src="cid:emailImage${index}" alt="Email attachment ${index + 1}" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 2px 8px rgba(78, 59, 50, 0.1);" />
             </td>
           </tr>
-      `
-      : ''
+      `).join('')
+    }
 
     const emailHtml = `
 <!DOCTYPE html>
@@ -155,24 +156,25 @@ ${message}
         replyTo: process.env.LINDA_EMAIL || 'linda@havenhoney.co',
       }
 
-      // Add image as CID attachment if present
-      if (image) {
-        // Extract base64 data and mime type from data URL
-        const matches = image.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
-        if (matches && matches.length === 3) {
-          const mimeType = matches[1]
-          const base64Data = matches[2]
-          
-          mailOptions.attachments = [
-            {
-              filename: 'image.jpg',
+      // Add images as CID attachments if present
+      if (images && Array.isArray(images) && images.length > 0) {
+        mailOptions.attachments = images.map((imageData: string, index: number) => {
+          // Extract base64 data and mime type from data URL
+          const matches = imageData.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
+          if (matches && matches.length === 3) {
+            const mimeType = matches[1]
+            const base64Data = matches[2]
+            
+            return {
+              filename: `image${index + 1}.jpg`,
               content: base64Data,
               encoding: 'base64',
-              cid: 'emailImage', // Same CID used in the img src
+              cid: `emailImage${index}`, // Same CID used in the img src
               contentType: mimeType,
-            },
-          ]
-        }
+            }
+          }
+          return null
+        }).filter(Boolean)
       }
 
       // Send email
