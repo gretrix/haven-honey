@@ -19,14 +19,14 @@ const SERVICE_CATEGORIES = [
   'Other',
 ] as const
 
-// Validation schema
+// Validation schema - use any for FileList to avoid SSR issues
 const reviewSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email'),
   star_rating: z.string().min(1, 'Please select a rating'),
   service_category: z.string().min(1, 'Please select a service category'),
   review_text: z.string().optional(),
-  screenshot: z.instanceof(FileList).refine((files) => files.length > 0, 'Please upload a screenshot'),
+  screenshot: z.any().refine((files) => files && files.length > 0, 'Please upload a screenshot'),
 })
 
 type ReviewFormData = z.infer<typeof reviewSchema>
@@ -301,7 +301,7 @@ export default function ReviewSubmissionForm() {
           )}
         </div>
         {errors.screenshot && (
-          <p className="mt-2 text-sm text-red-500">{errors.screenshot.message}</p>
+          <p className="mt-2 text-sm text-red-500">{String(errors.screenshot.message)}</p>
         )}
         <p className="mt-2 text-xs text-brown/50">
           Upload a screenshot of your review from Google, Facebook, or any platform
