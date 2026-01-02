@@ -1,0 +1,28 @@
+========================================
+DEPLOY EMAIL COPY FIX - SIMPLE STEPS
+========================================
+
+Linda, the email copy issue is FIXED in the code!
+
+Your test proved Gmail is fine - the problem was only in the website code.
+
+DEPLOY NOW:
+-----------
+
+1. SSH into your EC2 server
+
+2. Run these commands:
+
+   cd /var/www/havenhoney
+   git pull
+   npm install
+   npm run build
+   pm2 restart havenhoney
+
+3. Test by sending a mass email to 2-3 contacts from the admin panel
+
+4. You should NOT receive copies anymore!
+
+That's it! ✅
+
+========================================

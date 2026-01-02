@@ -154,6 +154,11 @@ ${message}
         subject,
         html: emailHtml,
         replyTo: process.env.LINDA_EMAIL || 'linda@havenhoney.co',
+        // Prevent BCC copies to sender
+        envelope: {
+          from: process.env.SMTP_FROM || process.env.SMTP_USER,
+          to: to_email
+        }
       }
 
       // Add images as CID attachments if present
