@@ -48,6 +48,9 @@ ADD COLUMN media_type ENUM('image', 'video') DEFAULT 'image' AFTER category,
 ADD COLUMN video_url VARCHAR(500) NULL AFTER image_url,
 ADD INDEX idx_media_type (media_type);
 
+-- Make image_url nullable to support videos (videos won't have image_url)
+ALTER TABLE work_photos MODIFY COLUMN image_url VARCHAR(500) NULL;
+
 -- Update existing records to be 'image' type
 UPDATE work_photos SET media_type = 'image' WHERE media_type IS NULL;
 

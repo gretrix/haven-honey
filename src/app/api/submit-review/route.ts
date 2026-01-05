@@ -30,12 +30,16 @@ export async function POST(request: NextRequest) {
     // Get all images (support multiple)
     const images: File[] = []
     let imageIndex = 0
+    console.log('🔥 API: Parsing FormData for images...')
     while (true) {
-      const image = formData.get(imageIndex === 0 ? 'screenshot' : `screenshot_${imageIndex}`) as File
+      const fieldName = imageIndex === 0 ? 'screenshot' : `screenshot_${imageIndex}`
+      const image = formData.get(fieldName) as File
+      console.log(`🔥 API: Checking field "${fieldName}":`, image ? `Found (${image.name}, ${image.size} bytes)` : 'Not found')
       if (!image || image.size === 0) break
       images.push(image)
       imageIndex++
     }
+    console.log(`🔥 API: Total images received: ${images.length}`)
 
     // Validate required fields
     if (!name || !email || !starRating || !serviceCategory || images.length === 0) {

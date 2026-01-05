@@ -71,8 +71,15 @@ export async function POST(request: NextRequest) {
     const category = formData.get('category') as string
     const mediaType = formData.get('media_type') as string || 'image'
     
+    console.log('🔥 Work Photos API - Received:')
+    console.log('  - media_type:', mediaType)
+    console.log('  - category:', category)
+    console.log('  - image:', image ? `${image.name} (${image.size} bytes)` : 'null')
+    console.log('  - video:', video ? `${video.name} (${video.size} bytes)` : 'null')
+    
     // Check if either image or video is provided based on media type
     if (mediaType === 'video' && !video) {
+      console.log('🔥 ERROR: Video file is required but not provided')
       return NextResponse.json(
         { success: false, error: 'Video file is required for video type' },
         { status: 400 }
@@ -80,6 +87,7 @@ export async function POST(request: NextRequest) {
     }
     
     if (mediaType === 'image' && !image) {
+      console.log('🔥 ERROR: Image file is required but not provided')
       return NextResponse.json(
         { success: false, error: 'Image is required for image type' },
         { status: 400 }
@@ -98,7 +106,9 @@ export async function POST(request: NextRequest) {
 
     // Upload file based on media type
     if (mediaType === 'video' && video) {
+      console.log('🔥 Uploading video file...')
       const uploadResult = await saveUploadedFile(video, 'work-photos', 'video')
+      console.log('🔥 Video upload result:', uploadResult)
       if (!uploadResult.success) {
         return NextResponse.json(
           { success: false, error: uploadResult.error },
@@ -106,8 +116,11 @@ export async function POST(request: NextRequest) {
         )
       }
       videoUrl = uploadResult.url
+      console.log('🔥 Video uploaded successfully to:', videoUrl)
     } else if (image) {
+      console.log('🔥 Uploading image file...')
       const uploadResult = await saveUploadedFile(image, 'work-photos', 'image')
+      console.log('🔥 Image upload result:', uploadResult)
       if (!uploadResult.success) {
         return NextResponse.json(
           { success: false, error: uploadResult.error },
@@ -115,6 +128,7 @@ export async function POST(request: NextRequest) {
         )
       }
       imageUrl = uploadResult.url
+      console.log('🔥 Image uploaded successfully to:', imageUrl)
     }
 
     // Extract other fields
@@ -126,6 +140,17 @@ export async function POST(request: NextRequest) {
 
     // Convert date to MySQL DATE format (YYYY-MM-DD)
     const formattedDate = photoDate ? new Date(photoDate).toISOString().split('T')[0] : null
+    
+    console.log('🔥 About to insert into database with values:')
+    console.log('  - category:', category)
+    console.log('  - mediaType:', mediaType)
+    console.log('  - caption:', caption || null)
+    console.log('  - description:', description || null)
+    console.log('  - imageUrl:', imageUrl)
+    console.log('  - videoUrl:', videoUrl)
+    console.log('  - formattedDate:', formattedDate)
+    console.log('  - isPublished:', isPublished)
+    console.log('  - displayOrder:', displayOrder)
     
     // Insert into database
     const [result] = await pool.execute(

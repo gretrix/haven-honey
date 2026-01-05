@@ -88,6 +88,8 @@ export default function ReviewSubmissionForm() {
 
   const onSubmit = async (data: ReviewFormData) => {
     // Validate that at least one image is selected
+    console.log('🔥 Form submit - selectedFiles:', selectedFiles.length, selectedFiles)
+    
     if (selectedFiles.length === 0) {
       toast.error('Please upload at least one image')
       return
@@ -121,20 +123,22 @@ export default function ReviewSubmissionForm() {
       }
       
       // Append all images from selectedFiles array (respects removed images)
+      console.log('🔥 Appending', selectedFiles.length, 'files to FormData')
       for (let i = 0; i < selectedFiles.length; i++) {
-        if (i === 0) {
-          formData.append('screenshot', selectedFiles[i])
-        } else {
-          formData.append(`screenshot_${i}`, selectedFiles[i])
-        }
+        const fieldName = i === 0 ? 'screenshot' : `screenshot_${i}`
+        console.log(`🔥 Appending file ${i}:`, fieldName, selectedFiles[i].name)
+        formData.append(fieldName, selectedFiles[i])
       }
       
       formData.append('recaptchaToken', recaptchaToken)
 
+      console.log('🔥 Sending request with FormData')
       const response = await fetch('/api/submit-review', {
         method: 'POST',
         body: formData,
       })
+
+      console.log('🔥 Response status:', response.status)
 
       const result = await response.json()
 

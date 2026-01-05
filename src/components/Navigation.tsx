@@ -13,10 +13,14 @@ export default function Navigation({ variant = 'page' }: NavigationProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen)
+    console.log('🔥 Toggle menu clicked, current state:', mobileMenuOpen)
+    const newState = !mobileMenuOpen
+    setMobileMenuOpen(newState)
+    console.log('🔥 New menu state:', newState)
   }
 
   const closeMobileMenu = () => {
+    console.log('🔥 Closing menu')
     setMobileMenuOpen(false)
   }
 
@@ -100,13 +104,14 @@ export default function Navigation({ variant = 'page' }: NavigationProps) {
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
+            {console.log('🔥 Rendering mobile menu panel, links:', links)}
             {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={closeMobileMenu}
-              className="fixed inset-0 bg-black/50 lg:hidden"
+              className="fixed inset-0 bg-black/50 lg:hidden z-[200]"
               style={{ top: '88px' }}
             />
 
@@ -116,7 +121,7 @@ export default function Navigation({ variant = 'page' }: NavigationProps) {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed right-0 top-[88px] bottom-0 w-full max-w-sm bg-cream-50 shadow-2xl lg:hidden overflow-y-auto"
+              className="fixed right-0 top-[88px] bottom-0 w-full max-w-sm bg-cream-50 shadow-2xl lg:hidden overflow-y-auto z-[300]"
             >
               <div className="p-8 space-y-6">
                 {/* Navigation Links */}
