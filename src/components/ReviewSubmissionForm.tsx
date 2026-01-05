@@ -52,8 +52,20 @@ export default function ReviewSubmissionForm() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (files && files.length > 0) {
-      // Limit to 10 images
-      const fileArray = Array.from(files).slice(0, 10)
+      // Filter out non-image files (only accept images)
+      const fileArray = Array.from(files).filter(file => {
+        const isImage = file.type.startsWith('image/')
+        if (!isImage) {
+          console.log('🔥 Skipping non-image file:', file.name, file.type)
+          toast.error(`${file.name} is not an image file. Only images are allowed.`)
+        }
+        return isImage
+      }).slice(0, 10) // Limit to 10 images
+      
+      if (fileArray.length === 0) {
+        toast.error('Please select image files only (JPG, PNG, WebP, etc.)')
+        return
+      }
       
       // Store files in state
       setSelectedFiles(fileArray)

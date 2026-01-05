@@ -122,8 +122,9 @@ export default function Navigation({ variant = 'page' }: NavigationProps) {
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               className="fixed right-0 top-[88px] bottom-0 w-full max-w-sm bg-cream-50 shadow-2xl lg:hidden overflow-y-auto z-[300]"
+              style={{ height: 'calc(100vh - 88px)' }}
             >
-              <div className="p-8 space-y-6">
+              <div className="p-6 sm:p-8 space-y-6 min-h-full">
                 {/* Navigation Links */}
                 <div className="space-y-4">
                   {links.map((link, index) => (

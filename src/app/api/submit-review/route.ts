@@ -106,10 +106,19 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Upload all images
+    // Upload all images (validate they are images, not videos)
     const uploadedUrls: string[] = []
     for (const image of images) {
-      const uploadResult = await saveUploadedFile(image, 'reviews')
+      // Validate it's an image file
+      if (!image.type.startsWith('image/')) {
+        console.log(`🔥 API: Rejecting non-image file: ${image.name} (${image.type})`)
+        return NextResponse.json(
+          { success: false, error: `File ${image.name} is not an image. Only image files are allowed for reviews.` },
+          { status: 400 }
+        )
+      }
+      
+      const uploadResult = await saveUploadedFile(image, 'reviews', 'image')
       if (!uploadResult.success || !uploadResult.url) {
         return NextResponse.json(
           { success: false, error: uploadResult.error || 'Failed to upload image' },

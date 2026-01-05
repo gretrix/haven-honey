@@ -157,7 +157,7 @@ export default function WorkPage() {
                     <div className="aspect-square">
                       {photo.media_type === 'video' && photo.video_url ? (
                         <video
-                          src={`/api${photo.video_url}`}
+                          src={photo.video_url}
                           className="w-full h-full object-cover"
                           controls
                           preload="metadata"
@@ -229,7 +229,7 @@ export default function WorkPage() {
                 <div className="md:col-span-3 bg-cream-100 flex items-center justify-center">
                   {selectedPhoto.media_type === 'video' && selectedPhoto.video_url ? (
                     <video
-                      src={`/api${selectedPhoto.video_url}`}
+                      src={selectedPhoto.video_url}
                       className="w-full h-auto max-h-[70vh] md:max-h-screen"
                       controls
                       autoPlay
