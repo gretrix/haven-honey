@@ -16,6 +16,7 @@ interface ReviewSubmission {
   admin_notes: string | null
   created_at: string
   reviewed_at: string | null
+  images?: Array<{ image_url: string; display_order: number }>
 }
 
 export default function ReviewSubmissionsModule() {
@@ -253,11 +254,17 @@ export default function ReviewSubmissionsModule() {
             <div className="flex gap-6">
               {/* Screenshot Thumbnail */}
               <div className="flex-shrink-0 w-32 h-32 rounded-2xl overflow-hidden bg-cream-100 border-2 border-cream-200">
-                <img
-                  src={`/api${submission.screenshot_url}`}
-                  alt="Review screenshot"
-                  className="w-full h-full object-cover"
-                />
+                {submission.screenshot_url ? (
+                  <img
+                    src={`/api${submission.screenshot_url}`}
+                    alt="Review screenshot"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-brown/40 text-xs">
+                    No image
+                  </div>
+                )}
               </div>
 
               <div className="flex-1">
@@ -384,15 +391,43 @@ export default function ReviewSubmissionsModule() {
               {/* Screenshot */}
               <div>
                 <label className="block text-sm font-medium text-brown mb-2">
-                  Screenshot
+                  {selectedSubmission.images && selectedSubmission.images.length > 1 
+                    ? `Screenshots (${selectedSubmission.images.length})` 
+                    : 'Screenshot'}
                 </label>
-                <div className="bg-cream-100 rounded-2xl overflow-hidden border-2 border-cream-200">
-                  <img
-                    src={`/api${selectedSubmission.screenshot_url}`}
-                    alt="Review screenshot"
-                    className="w-full h-auto"
-                  />
-                </div>
+                {selectedSubmission.images && selectedSubmission.images.length > 0 ? (
+                  <div className="grid grid-cols-2 gap-4">
+                    {selectedSubmission.images.map((img, idx) => (
+                      <div key={idx} className="bg-cream-100 rounded-2xl overflow-hidden border-2 border-cream-200">
+                        {img.image_url ? (
+                          <img
+                            src={`/api${img.image_url}`}
+                            alt={`Review screenshot ${idx + 1}`}
+                            className="w-full h-auto"
+                          />
+                        ) : (
+                          <div className="w-full h-32 flex items-center justify-center text-brown/40">
+                            No image
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-cream-100 rounded-2xl overflow-hidden border-2 border-cream-200">
+                    {selectedSubmission.screenshot_url ? (
+                      <img
+                        src={`/api${selectedSubmission.screenshot_url}`}
+                        alt="Review screenshot"
+                        className="w-full h-auto"
+                      />
+                    ) : (
+                      <div className="w-full h-32 flex items-center justify-center text-brown/40">
+                        No image
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Reviewer Info */}

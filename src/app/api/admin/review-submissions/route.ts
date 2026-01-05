@@ -29,10 +29,21 @@ export async function GET(request: NextRequest) {
     query += ' ORDER BY created_at DESC'
 
     const [rows] = await pool.execute(query, params)
+    const submissions = rows as any[]
+
+    // Fetch images for each submission
+    for (const submission of submissions) {
+      const [imageRows] = await pool.execute(
+        'SELECT image_url, display_order FROM review_submission_images WHERE submission_id = ? ORDER BY display_order ASC',
+        [submission.id]
+      )
+      submission.images = imageRows
+      console.log(`🔥 Submission ${submission.id} has ${(imageRows as any[]).length} images`)
+    }
 
     return NextResponse.json({
       success: true,
-      submissions: rows,
+      submissions: submissions,
     })
   } catch (error) {
     console.error('Failed to fetch review submissions:', error)
@@ -77,8 +88,18 @@ export async function PATCH(request: NextRequest) {
     const submission = submissionRows[0]
 
     if (action === 'approve') {
+      console.log('🔥 Approving review submission ID:', id)
+      
+      // Get all images for this submission
+      const [imageRows] = await pool.execute(
+        'SELECT image_url, display_order FROM review_submission_images WHERE submission_id = ? ORDER BY display_order ASC',
+        [id]
+      )
+      const submissionImages = imageRows as any[]
+      console.log(`🔥 Found ${submissionImages.length} images for submission`)
+      
       // Create a new review in the reviews table
-      await pool.execute(
+      const [reviewResult] = await pool.execute(
         `INSERT INTO reviews 
          (reviewer_name, star_rating, review_text, screenshot_url, tag, is_featured, is_published, display_order) 
          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -93,6 +114,21 @@ export async function PATCH(request: NextRequest) {
           0, // default display order
         ]
       )
+      
+      const reviewInsertResult = reviewResult as any
+      const reviewId = reviewInsertResult.insertId
+      console.log('🔥 Created review with ID:', reviewId)
+      
+      // Copy all images to review_images table
+      if (submissionImages.length > 0) {
+        for (const img of submissionImages) {
+          await pool.execute(
+            'INSERT INTO review_images (review_id, image_url, display_order) VALUES (?, ?, ?)',
+            [reviewId, img.image_url, img.display_order]
+          )
+        }
+        console.log(`🔥 Copied ${submissionImages.length} images to review_images table`)
+      }
 
       // Mark submission as approved
       await pool.execute(

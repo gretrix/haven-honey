@@ -173,6 +173,9 @@ export default function WorkPage() {
                           className="w-full h-full object-cover"
                           controls
                           preload="metadata"
+                          onError={(e) => {
+                            console.error('🔥 Video load error:', photo.video_url, e)
+                          }}
                         />
                       ) : photo.image_url ? (
                         <img
@@ -245,6 +248,9 @@ export default function WorkPage() {
                       className="w-full h-auto max-h-[70vh] md:max-h-screen"
                       controls
                       autoPlay
+                      onError={(e) => {
+                        console.error('🔥 Video load error in modal:', selectedPhoto.video_url, e)
+                      }}
                     />
                   ) : selectedPhoto.image_url ? (
                     <img

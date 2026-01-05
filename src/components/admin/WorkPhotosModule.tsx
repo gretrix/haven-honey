@@ -562,13 +562,26 @@ export default function WorkPhotosModule() {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-cream-50 rounded-3xl p-6 shadow-lg"
           >
-            {/* Photo */}
+            {/* Photo or Video */}
             <div className="relative mb-4 rounded-2xl overflow-hidden bg-cream-100 aspect-[4/3]">
-              <img
-                src={`/api${photo.image_url}`}
-                alt={photo.caption || photo.category}
-                className="w-full h-full object-cover"
-              />
+              {photo.media_type === 'video' && photo.video_url ? (
+                <video
+                  src={photo.video_url}
+                  className="w-full h-full object-cover"
+                  controls
+                  preload="metadata"
+                />
+              ) : photo.image_url ? (
+                <img
+                  src={`/api${photo.image_url}`}
+                  alt={photo.caption || photo.category}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-brown/40">
+                  No media
+                </div>
+              )}
               <div
                 className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium ${
                   photo.is_published
@@ -578,6 +591,11 @@ export default function WorkPhotosModule() {
               >
                 {photo.is_published ? '✓ Published' : 'Draft'}
               </div>
+              {photo.media_type === 'video' && (
+                <div className="absolute top-2 left-2 px-2 py-1 rounded-full text-xs font-medium bg-honey/90 text-cream-50">
+                  🎥 Video
+                </div>
+              )}
             </div>
 
             {/* Info */}
