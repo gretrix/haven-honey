@@ -203,7 +203,7 @@ export default function ReviewsPage() {
                   >
                     <div className="bg-cream-50 rounded-3xl p-6 shadow-xl h-full flex flex-col">
                       {/* Featured Badge */}
-                      {review.is_featured && (
+                      {Boolean(review.is_featured) && (
                         <div className="inline-flex items-center gap-1 bg-honey text-cream-50 px-3 py-1 rounded-full text-xs font-medium shadow-md mb-3 self-start">
                           ⭐ Featured
                         </div>
@@ -377,7 +377,7 @@ export default function ReviewsPage() {
                 >
                   <div className="bg-cream-50 rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 h-full flex flex-col">
                     {/* Featured Badge */}
-                    {review.is_featured && (
+                    {Boolean(review.is_featured) && (
                       <div className="inline-flex items-center gap-1 bg-honey text-cream-50 px-3 py-1 rounded-full text-xs font-medium shadow-md mb-3 self-start">
                         ⭐ Featured
                       </div>
@@ -554,7 +554,7 @@ export default function ReviewsPage() {
               </button>
 
               {/* Featured Badge */}
-              {selectedReview.is_featured && (
+              {Boolean(selectedReview.is_featured) && (
                 <div className="inline-block bg-honey text-cream-50 px-3 py-1 rounded-full text-xs font-medium shadow-md mb-4">
                   ⭐ Featured Review
                 </div>
