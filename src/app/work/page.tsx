@@ -66,7 +66,7 @@ export default function WorkPage() {
   }
 
   return (
-    <main className="min-h-screen bg-cream-100">
+    <main className="min-h-screen bg-cream-100 overflow-x-hidden">
       {/* Navigation */}
       <Navigation variant="page" />
 

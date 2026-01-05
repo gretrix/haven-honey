@@ -2,9 +2,11 @@ import { writeFile, mkdir } from 'fs/promises'
 import { existsSync } from 'fs'
 import path from 'path'
 
-// Allowed image types
+// Allowed file types
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif']
-const MAX_FILE_SIZE = 15 * 1024 * 1024 // 15MB (increased for blog featured images)
+const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/webm', 'video/mpeg']
+const MAX_FILE_SIZE = 15 * 1024 * 1024 // 15MB for images
+const MAX_VIDEO_SIZE = 50 * 1024 * 1024 // 50MB for videos
 
 export interface UploadResult {
   success: boolean
@@ -12,7 +14,7 @@ export interface UploadResult {
   error?: string
 }
 
-// Validate file
+// Validate image file
 export function validateImageFile(file: File): { valid: boolean; error?: string } {
   // Check file type
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
@@ -33,6 +35,35 @@ export function validateImageFile(file: File): { valid: boolean; error?: string 
   return { valid: true }
 }
 
+// Validate video file
+export function validateVideoFile(file: File): { valid: boolean; error?: string } {
+  // Check file type
+  if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
+    return {
+      valid: false,
+      error: `Invalid video type. Allowed types: MP4, MOV, AVI, WebM, MPEG`,
+    }
+  }
+
+  // Check file size
+  if (file.size > MAX_VIDEO_SIZE) {
+    return {
+      valid: false,
+      error: `Video too large. Maximum size: ${MAX_VIDEO_SIZE / (1024 * 1024)}MB`,
+    }
+  }
+
+  return { valid: true }
+}
+
+// Validate any media file (image or video)
+export function validateMediaFile(file: File, type: 'image' | 'video'): { valid: boolean; error?: string } {
+  if (type === 'video') {
+    return validateVideoFile(file)
+  }
+  return validateImageFile(file)
+}
+
 // Generate unique filename
 export function generateUniqueFilename(originalName: string): string {
   const timestamp = Date.now()
@@ -45,11 +76,12 @@ export function generateUniqueFilename(originalName: string): string {
 // Save uploaded file
 export async function saveUploadedFile(
   file: File,
-  folder: 'reviews' | 'work-photos' | 'blog'
+  folder: 'reviews' | 'work-photos' | 'blog',
+  mediaType: 'image' | 'video' = 'image'
 ): Promise<UploadResult> {
   try {
-    // Validate file
-    const validation = validateImageFile(file)
+    // Validate file based on media type
+    const validation = validateMediaFile(file, mediaType)
     if (!validation.valid) {
       return { success: false, error: validation.error }
     }

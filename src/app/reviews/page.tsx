@@ -76,7 +76,7 @@ export default function ReviewsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-cream-100">
+    <main className="min-h-screen bg-cream-100 overflow-x-hidden">
       {/* Navigation */}
       <Navigation variant="page" />
 
@@ -175,8 +175,8 @@ export default function ReviewsPage() {
           )}
 
           {/* Mobile: Horizontal Scroll Carousel */}
-          <div className="lg:hidden">
-            <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide -mx-6 px-6">
+          <div className="lg:hidden w-full">
+            <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide -mx-6 px-6 max-w-[100vw]">
               {reviews.map((review) => {
                 const images = review.images && review.images.length > 0 ? review.images : [{ image_url: review.screenshot_url, display_order: 0 }]
                 const currentIdx = currentImageIndex[review.id] || 0

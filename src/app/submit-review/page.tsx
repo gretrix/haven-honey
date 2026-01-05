@@ -24,7 +24,7 @@ const staggerContainer = {
 
 export default function SubmitReviewPage() {
   return (
-    <main className="min-h-screen bg-cream-100">
+    <main className="min-h-screen bg-cream-100 overflow-x-hidden">
       {/* Navigation */}
       <Navigation variant="page" />
 

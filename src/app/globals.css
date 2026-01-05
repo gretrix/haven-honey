@@ -29,7 +29,12 @@ html {
 
 /* Base styles */
 body {
-  @apply bg-cream-100 text-brown font-sans antialiased;
+  @apply bg-cream-100 text-brown font-sans antialiased overflow-x-hidden;
+}
+
+html {
+  @apply overflow-x-hidden;
+  max-width: 100vw;
 }
 
 /* Custom utilities */

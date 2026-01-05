@@ -26,17 +26,7 @@ const reviewSchema = z.object({
   star_rating: z.string().min(1, 'Please select a rating'),
   service_category: z.string().min(1, 'Please select a service category'),
   review_text: z.string().optional(),
-  screenshots: z.any().refine(
-    (files) => {
-      // Check if files exist and has at least one file
-      if (!files) return false
-      if (typeof files === 'object' && 'length' in files) {
-        return files.length > 0 && files.length <= 10
-      }
-      return false
-    },
-    'Please upload 1-10 images'
-  ),
+  screenshots: z.any().optional(), // Will validate using selectedFiles state instead
 })
 
 type ReviewFormData = z.infer<typeof reviewSchema>
@@ -46,6 +36,7 @@ export default function ReviewSubmissionForm() {
   const [isSuccess, setIsSuccess] = useState(false)
   const [selectedRating, setSelectedRating] = useState(0)
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const { executeRecaptcha } = useGoogleReCaptcha()
 
   const {
@@ -63,6 +54,9 @@ export default function ReviewSubmissionForm() {
     if (files && files.length > 0) {
       // Limit to 10 images
       const fileArray = Array.from(files).slice(0, 10)
+      
+      // Store files in state
+      setSelectedFiles(fileArray)
       
       // Update form value
       setValue('screenshots', files, { shouldValidate: true })
@@ -87,12 +81,23 @@ export default function ReviewSubmissionForm() {
   }
 
   const removePreview = (index: number) => {
+    // Remove from both preview URLs and selected files
     setPreviewUrls(prev => prev.filter((_, i) => i !== index))
-    // Note: We should also update the form value, but FileList is immutable
-    // So we'll handle this on submit by only sending the previewed images
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index))
   }
 
   const onSubmit = async (data: ReviewFormData) => {
+    // Validate that at least one image is selected
+    if (selectedFiles.length === 0) {
+      toast.error('Please upload at least one image')
+      return
+    }
+
+    if (selectedFiles.length > 10) {
+      toast.error('Maximum 10 images allowed')
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
@@ -115,13 +120,12 @@ export default function ReviewSubmissionForm() {
         formData.append('review_text', data.review_text)
       }
       
-      // Append all images
-      const files = data.screenshots as FileList
-      for (let i = 0; i < files.length; i++) {
+      // Append all images from selectedFiles array (respects removed images)
+      for (let i = 0; i < selectedFiles.length; i++) {
         if (i === 0) {
-          formData.append('screenshot', files[i])
+          formData.append('screenshot', selectedFiles[i])
         } else {
-          formData.append(`screenshot_${i}`, files[i])
+          formData.append(`screenshot_${i}`, selectedFiles[i])
         }
       }
       
@@ -143,6 +147,7 @@ export default function ReviewSubmissionForm() {
         reset()
         setSelectedRating(0)
         setPreviewUrls([])
+        setSelectedFiles([])
 
         // Reset success state after 5 seconds
         setTimeout(() => setIsSuccess(false), 5000)

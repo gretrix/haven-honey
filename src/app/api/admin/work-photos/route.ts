@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
 
     // Upload file based on media type
     if (mediaType === 'video' && video) {
-      const uploadResult = await saveUploadedFile(video, 'work-photos')
+      const uploadResult = await saveUploadedFile(video, 'work-photos', 'video')
       if (!uploadResult.success) {
         return NextResponse.json(
           { success: false, error: uploadResult.error },
@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
       }
       videoUrl = uploadResult.url
     } else if (image) {
-      const uploadResult = await saveUploadedFile(image, 'work-photos')
+      const uploadResult = await saveUploadedFile(image, 'work-photos', 'image')
       if (!uploadResult.success) {
         return NextResponse.json(
           { success: false, error: uploadResult.error },

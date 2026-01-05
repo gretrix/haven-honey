@@ -39,7 +39,7 @@ export default function AdminDashboard() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-cream-100 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-cream-100 flex items-center justify-center p-4 sm:p-6 overflow-x-hidden">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -69,8 +69,8 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-cream-100 p-4 sm:p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-cream-100 p-4 sm:p-8 overflow-x-hidden">
+      <div className="max-w-7xl mx-auto w-full">
         {/* Header */}
         <div className="bg-cream-50 rounded-3xl p-6 sm:p-8 shadow-lg mb-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">

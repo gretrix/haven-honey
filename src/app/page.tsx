@@ -84,7 +84,7 @@ export default function Home() {
   const [activeTestimonial, setActiveTestimonial] = useState(0)
 
   return (
-    <main className="overflow-hidden">
+    <main className="overflow-x-hidden">
       {/* Navigation */}
       <Navigation variant="home" />
 
