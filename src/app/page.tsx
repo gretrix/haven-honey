@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef, useState } from 'react'
 import ContactForm from '@/components/ContactForm'
 import ReCaptchaProvider from '@/components/ReCaptchaProvider'
+import Navigation from '@/components/Navigation'
 
 // Animation variants
 const fadeInUp = {
@@ -85,28 +86,7 @@ export default function Home() {
   return (
     <main className="overflow-hidden">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-cream-100/90 backdrop-blur-md border-b border-cream-300/50">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-          <a href="#" className="flex items-center gap-4">
-            <Image
-              src="/images/haven-honey-logo-circle-transparent.png"
-              alt="Haven & Honey"
-              width={56}
-              height={56}
-              className="w-14 h-14"
-            />
-            <span className="font-serif text-xl text-brown hidden sm:block">Haven & Honey</span>
-          </a>
-          <div className="flex items-center gap-6 sm:gap-10">
-            <a href="#about" className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium">About</a>
-            <a href="#services" className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium">Services</a>
-            <a href="/life-with-linda" className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium">Blog</a>
-            <a href="/reviews" className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium">Reviews</a>
-            <a href="/work" className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium">Work</a>
-            <a href="#contact" className="btn-primary text-base py-3 px-6 sm:py-4 sm:px-8">Contact</a>
-          </div>
-        </div>
-      </nav>
+      <Navigation variant="home" />
 
       {/* ═══════════════════════════════════════════════════════════════════
           SECTION 1: HERO HEADER

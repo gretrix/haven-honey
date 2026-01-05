@@ -4,13 +4,16 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
+import Navigation from '@/components/Navigation'
 
 interface WorkPhoto {
   id: number
   category: string
+  media_type: 'image' | 'video'
   caption: string | null
   description: string | null
-  image_url: string
+  image_url: string | null
+  video_url: string | null
   photo_date: string | null
 }
 
@@ -65,42 +68,7 @@ export default function WorkPage() {
   return (
     <main className="min-h-screen bg-cream-100">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-cream-100/90 backdrop-blur-md border-b border-cream-300/50">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-4">
-            <Image
-              src="/images/haven-honey-logo-circle-transparent.png"
-              alt="Haven & Honey"
-              width={56}
-              height={56}
-              className="w-14 h-14"
-            />
-            <span className="font-serif text-xl text-brown hidden sm:block">
-              Haven & Honey
-            </span>
-          </Link>
-          <div className="flex items-center gap-6 sm:gap-10">
-            <Link
-              href="/"
-              className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium"
-            >
-              Home
-            </Link>
-            <Link
-              href="/reviews"
-              className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium"
-            >
-              Reviews
-            </Link>
-            <Link
-              href="/#contact"
-              className="btn-primary text-base py-3 px-6 sm:py-4 sm:px-8"
-            >
-              Contact
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <Navigation variant="page" />
 
       {/* Header */}
       <section className="pt-32 pb-16 px-6">
@@ -184,19 +152,30 @@ export default function WorkPage() {
                 onClick={() => setSelectedPhoto(photo)}
               >
                 <div className="relative bg-cream-50 rounded-3xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
-                  {/* Photo */}
+                  {/* Media - Photo or Video */}
                   <div className="relative bg-cream-100 rounded-2xl overflow-hidden mb-3">
                     <div className="aspect-square">
-                      <img
-                        src={`/api${photo.image_url}`}
-                        alt={photo.caption || photo.category}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
+                      {photo.media_type === 'video' && photo.video_url ? (
+                        <video
+                          src={`/api${photo.video_url}`}
+                          className="w-full h-full object-cover"
+                          controls
+                          preload="metadata"
+                        />
+                      ) : photo.image_url ? (
+                        <img
+                          src={`/api${photo.image_url}`}
+                          alt={photo.caption || photo.category}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      ) : null}
                     </div>
 
                     {/* Overlay on hover */}
                     <div className="absolute inset-0 bg-gradient-to-t from-brown/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                      <p className="text-cream-50 text-sm">Click to view</p>
+                      <p className="text-cream-50 text-sm">
+                        {photo.media_type === 'video' ? '🎥 Play video' : 'Click to view'}
+                      </p>
                     </div>
                   </div>
 
@@ -246,13 +225,22 @@ export default function WorkPage() {
               </button>
 
               <div className="grid md:grid-cols-5">
-                {/* Image Side */}
-                <div className="md:col-span-3 bg-cream-100">
-                  <img
-                    src={`/api${selectedPhoto.image_url}`}
-                    alt={selectedPhoto.caption || selectedPhoto.category}
-                    className="w-full h-full object-cover max-h-[70vh] md:max-h-screen"
-                  />
+                {/* Media Side - Image or Video */}
+                <div className="md:col-span-3 bg-cream-100 flex items-center justify-center">
+                  {selectedPhoto.media_type === 'video' && selectedPhoto.video_url ? (
+                    <video
+                      src={`/api${selectedPhoto.video_url}`}
+                      className="w-full h-auto max-h-[70vh] md:max-h-screen"
+                      controls
+                      autoPlay
+                    />
+                  ) : selectedPhoto.image_url ? (
+                    <img
+                      src={`/api${selectedPhoto.image_url}`}
+                      alt={selectedPhoto.caption || selectedPhoto.category}
+                      className="w-full h-full object-cover max-h-[70vh] md:max-h-screen"
+                    />
+                  ) : null}
                 </div>
 
                 {/* Info Side */}

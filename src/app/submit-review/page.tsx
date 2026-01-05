@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import ReviewSubmissionForm from '@/components/ReviewSubmissionForm'
 import ReCaptchaProvider from '@/components/ReCaptchaProvider'
+import Navigation from '@/components/Navigation'
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -25,42 +26,7 @@ export default function SubmitReviewPage() {
   return (
     <main className="min-h-screen bg-cream-100">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-cream-100/90 backdrop-blur-md border-b border-cream-300/50">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-4">
-            <Image
-              src="/images/haven-honey-logo-circle-transparent.png"
-              alt="Haven & Honey"
-              width={56}
-              height={56}
-              className="w-14 h-14"
-            />
-            <span className="font-serif text-xl text-brown hidden sm:block">
-              Haven & Honey
-            </span>
-          </Link>
-          <div className="flex items-center gap-6 sm:gap-10">
-            <Link
-              href="/"
-              className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium"
-            >
-              Home
-            </Link>
-            <Link
-              href="/reviews"
-              className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium"
-            >
-              Reviews
-            </Link>
-            <Link
-              href="/#contact"
-              className="btn-primary text-base py-3 px-6 sm:py-4 sm:px-8"
-            >
-              Contact
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <Navigation variant="page" />
 
       {/* Header Section */}
       <section className="pt-32 pb-16 px-6 relative">

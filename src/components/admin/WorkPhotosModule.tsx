@@ -7,9 +7,11 @@ import toast from 'react-hot-toast'
 interface WorkPhoto {
   id: number
   category: string
+  media_type: 'image' | 'video'
   caption: string | null
   description: string | null
-  image_url: string
+  image_url: string | null
+  video_url: string | null
   photo_date: string | null
   is_published: boolean
   display_order: number
@@ -26,6 +28,7 @@ export default function WorkPhotosModule() {
   // Form state
   const [formData, setFormData] = useState({
     category: 'Meal Prep',
+    media_type: 'image' as 'image' | 'video',
     caption: '',
     description: '',
     photo_date: '',
@@ -33,6 +36,7 @@ export default function WorkPhotosModule() {
     display_order: 0,
   })
   const [image, setImage] = useState<File | null>(null)
+  const [video, setVideo] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
 
   const categories = ['Meal Prep', 'Cleaning', 'Organizing', 'Gift Wrapping', 'Other']
@@ -69,8 +73,14 @@ export default function WorkPhotosModule() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!image && !editingPhoto) {
+    // Validate file based on media type
+    if (formData.media_type === 'image' && !image && !editingPhoto) {
       toast.error('Image is required')
+      return
+    }
+    
+    if (formData.media_type === 'video' && !video && !editingPhoto) {
+      toast.error('Video is required')
       return
     }
 
@@ -82,6 +92,10 @@ export default function WorkPhotosModule() {
 
       if (image) {
         formDataToSend.append('image', image)
+      }
+      
+      if (video) {
+        formDataToSend.append('video', video)
       }
 
       Object.entries(formData).forEach(([key, value]) => {
@@ -204,6 +218,7 @@ export default function WorkPhotosModule() {
     setEditingPhoto(photo)
     setFormData({
       category: photo.category,
+      media_type: photo.media_type || 'image',
       caption: photo.caption || '',
       description: photo.description || '',
       photo_date: photo.photo_date || '',
@@ -216,6 +231,7 @@ export default function WorkPhotosModule() {
   const resetForm = () => {
     setFormData({
       category: 'Meal Prep',
+      media_type: 'image',
       caption: '',
       description: '',
       photo_date: '',
@@ -223,6 +239,7 @@ export default function WorkPhotosModule() {
       display_order: 0,
     })
     setImage(null)
+    setVideo(null)
     setEditingPhoto(null)
   }
 
@@ -302,41 +319,87 @@ export default function WorkPhotosModule() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Media Upload - Image or Video */}
               <div>
                 <label className="block text-sm font-medium text-brown mb-2">
-                  Photo {!editingPhoto && <span className="text-honey">*</span>}
+                  {formData.media_type === 'image' ? '📷 Image' : '🎥 Video'} {!editingPhoto && <span className="text-honey">*</span>}
                 </label>
-                <div className="relative">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) =>
-                      setImage(e.target.files ? e.target.files[0] : null)
-                    }
-                    className="hidden"
-                    id="photo-upload"
-                    required={!editingPhoto}
-                  />
-                  <label
-                    htmlFor="photo-upload"
-                    className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-cream-100 border-2 border-dashed border-brown/30 rounded-2xl cursor-pointer hover:bg-cream-200 hover:border-brown/50 transition-colors"
-                  >
-                    <svg className="w-5 h-5 text-brown/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span className="text-brown/70">
-                      {image ? image.name : 'Choose work photo'}
-                    </span>
-                  </label>
-                </div>
+                
+                {formData.media_type === 'image' ? (
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        setImage(e.target.files ? e.target.files[0] : null)
+                      }
+                      className="hidden"
+                      id="photo-upload"
+                      required={!editingPhoto}
+                    />
+                    <label
+                      htmlFor="photo-upload"
+                      className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-cream-100 border-2 border-dashed border-brown/30 rounded-2xl cursor-pointer hover:bg-cream-200 hover:border-brown/50 transition-colors"
+                    >
+                      <svg className="w-5 h-5 text-brown/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <span className="text-brown/70">
+                        {image ? image.name : 'Choose image'}
+                      </span>
+                    </label>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={(e) =>
+                        setVideo(e.target.files ? e.target.files[0] : null)
+                      }
+                      className="hidden"
+                      id="video-upload"
+                      required={!editingPhoto}
+                    />
+                    <label
+                      htmlFor="video-upload"
+                      className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-cream-100 border-2 border-dashed border-brown/30 rounded-2xl cursor-pointer hover:bg-cream-200 hover:border-brown/50 transition-colors"
+                    >
+                      <svg className="w-5 h-5 text-brown/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      <span className="text-brown/70">
+                        {video ? video.name : 'Choose video (MP4, MOV, etc.)'}
+                      </span>
+                    </label>
+                  </div>
+                )}
+                
                 {editingPhoto && (
                   <p className="text-sm text-brown/60 mt-1">
-                    Leave empty to keep existing photo
+                    Leave empty to keep existing {formData.media_type}
                   </p>
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-brown mb-2">
+                    Media Type <span className="text-honey">*</span>
+                  </label>
+                  <select
+                    value={formData.media_type}
+                    onChange={(e) =>
+                      setFormData({ ...formData, media_type: e.target.value as 'image' | 'video' })
+                    }
+                    className="form-input"
+                    required
+                  >
+                    <option value="image">📷 Image</option>
+                    <option value="video">🎥 Video</option>
+                  </select>
+                </div>
+                
                 <div>
                   <label className="block text-sm font-medium text-brown mb-2">
                     Category <span className="text-honey">*</span>
@@ -359,7 +422,7 @@ export default function WorkPhotosModule() {
 
                 <div>
                   <label className="block text-sm font-medium text-brown mb-2">
-                    Photo Date
+                    Date
                   </label>
                   <input
                     type="date"

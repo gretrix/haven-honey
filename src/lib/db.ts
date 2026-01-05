@@ -187,21 +187,50 @@ export async function insertReviewSubmission(data: {
   service_category: string
   review_text?: string
   screenshot_url: string
+  image_urls?: string[]
 }) {
-  const [result] = await pool.execute(
-    `INSERT INTO review_submissions 
-     (reviewer_name, reviewer_email, star_rating, service_category, review_text, screenshot_url) 
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [
-      data.reviewer_name,
-      data.reviewer_email,
-      data.star_rating,
-      data.service_category,
-      data.review_text || null,
-      data.screenshot_url
-    ]
-  )
-  return result
+  const connection = await pool.getConnection()
+  
+  try {
+    await connection.beginTransaction()
+    
+    // Insert main review submission
+    const [result] = await connection.execute(
+      `INSERT INTO review_submissions 
+       (reviewer_name, reviewer_email, star_rating, service_category, review_text, screenshot_url) 
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [
+        data.reviewer_name,
+        data.reviewer_email,
+        data.star_rating,
+        data.service_category,
+        data.review_text || null,
+        data.screenshot_url
+      ]
+    )
+    
+    const insertResult = result as any
+    const submissionId = insertResult.insertId
+    
+    // Insert all images if provided
+    if (data.image_urls && data.image_urls.length > 0) {
+      for (let i = 0; i < data.image_urls.length; i++) {
+        await connection.execute(
+          `INSERT INTO review_submission_images (submission_id, image_url, display_order) 
+           VALUES (?, ?, ?)`,
+          [submissionId, data.image_urls[i], i]
+        )
+      }
+    }
+    
+    await connection.commit()
+    return result
+  } catch (error) {
+    await connection.rollback()
+    throw error
+  } finally {
+    connection.release()
+  }
 }
 
 

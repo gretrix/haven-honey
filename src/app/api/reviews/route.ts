@@ -23,10 +23,20 @@ export async function GET(request: NextRequest) {
     query += ' ORDER BY display_order ASC, created_at DESC'
 
     const [rows] = await pool.execute(query, params)
+    const reviews = rows as any[]
+
+    // Fetch images for each review
+    for (const review of reviews) {
+      const [imageRows] = await pool.execute(
+        'SELECT image_url, display_order FROM review_images WHERE review_id = ? ORDER BY display_order ASC',
+        [review.id]
+      )
+      review.images = imageRows
+    }
 
     return NextResponse.json({
       success: true,
-      reviews: rows,
+      reviews: reviews,
     })
   } catch (error) {
     console.error('Public reviews GET error:', error)

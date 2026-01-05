@@ -25,13 +25,22 @@ export async function POST(request: NextRequest) {
     const starRating = formData.get('star_rating') as string
     const serviceCategory = formData.get('service_category') as string
     const reviewText = formData.get('review_text') as string
-    const screenshot = formData.get('screenshot') as File
     const recaptchaToken = formData.get('recaptchaToken') as string
+    
+    // Get all images (support multiple)
+    const images: File[] = []
+    let imageIndex = 0
+    while (true) {
+      const image = formData.get(imageIndex === 0 ? 'screenshot' : `screenshot_${imageIndex}`) as File
+      if (!image || image.size === 0) break
+      images.push(image)
+      imageIndex++
+    }
 
     // Validate required fields
-    if (!name || !email || !starRating || !serviceCategory || !screenshot) {
+    if (!name || !email || !starRating || !serviceCategory || images.length === 0) {
       return NextResponse.json(
-        { success: false, error: 'Name, email, rating, category, and screenshot are required' },
+        { success: false, error: 'Name, email, rating, category, and at least one image are required' },
         { status: 400 }
       )
     }
@@ -54,10 +63,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate screenshot file
-    if (!screenshot || screenshot.size === 0) {
+    // Validate image count (max 10)
+    if (images.length > 10) {
       return NextResponse.json(
-        { success: false, error: 'Please upload a screenshot of your review' },
+        { success: false, error: 'Maximum 10 images allowed' },
         { status: 400 }
       )
     }
@@ -93,13 +102,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Upload screenshot
-    const uploadResult = await saveUploadedFile(screenshot, 'reviews')
-    if (!uploadResult.success || !uploadResult.url) {
-      return NextResponse.json(
-        { success: false, error: uploadResult.error || 'Failed to upload screenshot' },
-        { status: 400 }
-      )
+    // Upload all images
+    const uploadedUrls: string[] = []
+    for (const image of images) {
+      const uploadResult = await saveUploadedFile(image, 'reviews')
+      if (!uploadResult.success || !uploadResult.url) {
+        return NextResponse.json(
+          { success: false, error: uploadResult.error || 'Failed to upload image' },
+          { status: 400 }
+        )
+      }
+      uploadedUrls.push(uploadResult.url)
     }
 
     // Store in database
@@ -110,7 +123,8 @@ export async function POST(request: NextRequest) {
         star_rating: rating,
         service_category: serviceCategory,
         review_text: reviewText || undefined,
-        screenshot_url: uploadResult.url,
+        screenshot_url: uploadedUrls[0], // Primary image for backward compatibility
+        image_urls: uploadedUrls, // All images
       })
     } catch (dbError) {
       console.error('Database insert error:', dbError)

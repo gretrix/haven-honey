@@ -15,6 +15,8 @@ interface Review {
   is_featured: boolean
   is_published: boolean
   display_order: number
+  owner_reply: string | null
+  owner_reply_date: string | null
   created_at: string
 }
 
@@ -23,6 +25,9 @@ export default function ReviewsModule() {
   const [loading, setLoading] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
   const [editingReview, setEditingReview] = useState<Review | null>(null)
+  const [replyingToReview, setReplyingToReview] = useState<Review | null>(null)
+  const [replyText, setReplyText] = useState('')
+  const [savingReply, setSavingReply] = useState(false)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -162,6 +167,48 @@ export default function ReviewsModule() {
       }
     } catch (error) {
       toast.error('Error deleting review')
+    }
+  }
+
+  const openReplyModal = (review: Review) => {
+    setReplyingToReview(review)
+    setReplyText(review.owner_reply || '')
+  }
+
+  const saveOwnerReply = async () => {
+    if (!replyingToReview) return
+
+    setSavingReply(true)
+    const savedPassword = localStorage.getItem('admin_password')
+
+    try {
+      const response = await fetch('/api/admin/reviews', {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${savedPassword}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: replyingToReview.id,
+          owner_reply: replyText || null,
+          owner_reply_date: replyText ? new Date().toISOString() : null,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success(replyText ? 'Reply saved!' : 'Reply deleted!')
+        setReplyingToReview(null)
+        setReplyText('')
+        fetchReviews()
+      } else {
+        toast.error('Failed to save reply')
+      }
+    } catch (error) {
+      toast.error('Error saving reply')
+    } finally {
+      setSavingReply(false)
     }
   }
 
@@ -574,32 +621,130 @@ export default function ReviewsModule() {
                   {review.review_text}
                 </p>
               )}
+              
+              {/* Owner Reply Preview */}
+              {review.owner_reply && (
+                <div className="mt-3 pt-3 border-t border-cream-200">
+                  <div className="flex items-start gap-2">
+                    <div className="flex-shrink-0 w-5 h-5 bg-honey/20 rounded-full flex items-center justify-center text-xs">
+                      👋
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs font-medium text-brown mb-1">Your Reply:</p>
+                      <p className="text-xs text-brown/70 line-clamp-2">{review.owner_reply}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Actions */}
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => togglePublish(review)}
+                  className="btn-secondary text-xs flex-1"
+                >
+                  {review.is_published ? 'Unpublish' : 'Publish'}
+                </button>
+                <button
+                  onClick={() => openEditModal(review)}
+                  className="btn-secondary text-xs flex-1"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => deleteReview(review.id)}
+                  className="btn-secondary text-xs bg-red-100 hover:bg-red-200 text-red-700"
+                >
+                  Delete
+                </button>
+              </div>
               <button
-                onClick={() => togglePublish(review)}
-                className="btn-secondary text-xs flex-1"
+                onClick={() => openReplyModal(review)}
+                className="btn-secondary text-xs w-full bg-honey/10 hover:bg-honey/20 text-brown border-honey/30"
               >
-                {review.is_published ? 'Unpublish' : 'Publish'}
-              </button>
-              <button
-                onClick={() => openEditModal(review)}
-                className="btn-secondary text-xs flex-1"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => deleteReview(review.id)}
-                className="btn-secondary text-xs bg-red-100 hover:bg-red-200 text-red-700"
-              >
-                Delete
+                {review.owner_reply ? '✏️ Edit Reply' : '💬 Add Reply'}
               </button>
             </div>
           </motion.div>
         ))}
       </div>
+
+      {/* Owner Reply Modal */}
+      {replyingToReview && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-cream-50 rounded-3xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto"
+          >
+            <h3 className="font-serif text-2xl text-brown mb-4">
+              💬 Reply to Review
+            </h3>
+
+            {/* Review Preview */}
+            <div className="bg-cream-100 rounded-2xl p-4 mb-6">
+              <div className="flex items-start gap-3 mb-2">
+                <div>
+                  <p className="font-medium text-brown">
+                    {replyingToReview.reviewer_name || 'Anonymous'}
+                  </p>
+                  {replyingToReview.star_rating && (
+                    <div className="text-honey text-sm">
+                      {'⭐'.repeat(replyingToReview.star_rating)}
+                    </div>
+                  )}
+                </div>
+              </div>
+              {replyingToReview.review_text && (
+                <p className="text-sm text-brown/80 line-clamp-3">
+                  {replyingToReview.review_text}
+                </p>
+              )}
+            </div>
+
+            {/* Reply Input */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-brown mb-2">
+                Your Reply
+              </label>
+              <textarea
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                placeholder="Write a thoughtful reply to this review..."
+                className="form-textarea"
+                rows={6}
+                disabled={savingReply}
+              />
+              <p className="text-xs text-brown/50 mt-2">
+                This reply will be visible to all visitors on the reviews page
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3">
+              <button
+                onClick={saveOwnerReply}
+                disabled={savingReply}
+                className="btn-primary flex-1 disabled:opacity-50"
+              >
+                {savingReply ? 'Saving...' : replyText ? 'Save Reply' : 'Delete Reply'}
+              </button>
+              <button
+                onClick={() => {
+                  setReplyingToReview(null)
+                  setReplyText('')
+                }}
+                className="btn-secondary flex-1"
+                disabled={savingReply}
+              >
+                Cancel
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   )
 }

@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Create new work photo
+// POST - Create new work photo or video
 export async function POST(request: NextRequest) {
   try {
     if (!checkAuth(request)) {
@@ -67,11 +67,21 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData()
     const image = formData.get('image') as File
+    const video = formData.get('video') as File
     const category = formData.get('category') as string
+    const mediaType = formData.get('media_type') as string || 'image'
     
-    if (!image) {
+    // Check if either image or video is provided based on media type
+    if (mediaType === 'video' && !video) {
       return NextResponse.json(
-        { success: false, error: 'Image is required' },
+        { success: false, error: 'Video file is required for video type' },
+        { status: 400 }
+      )
+    }
+    
+    if (mediaType === 'image' && !image) {
+      return NextResponse.json(
+        { success: false, error: 'Image is required for image type' },
         { status: 400 }
       )
     }
@@ -83,13 +93,28 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Upload file
-    const uploadResult = await saveUploadedFile(image, 'work-photos')
-    if (!uploadResult.success) {
-      return NextResponse.json(
-        { success: false, error: uploadResult.error },
-        { status: 400 }
-      )
+    let imageUrl = null
+    let videoUrl = null
+
+    // Upload file based on media type
+    if (mediaType === 'video' && video) {
+      const uploadResult = await saveUploadedFile(video, 'work-photos')
+      if (!uploadResult.success) {
+        return NextResponse.json(
+          { success: false, error: uploadResult.error },
+          { status: 400 }
+        )
+      }
+      videoUrl = uploadResult.url
+    } else if (image) {
+      const uploadResult = await saveUploadedFile(image, 'work-photos')
+      if (!uploadResult.success) {
+        return NextResponse.json(
+          { success: false, error: uploadResult.error },
+          { status: 400 }
+        )
+      }
+      imageUrl = uploadResult.url
     }
 
     // Extract other fields
@@ -105,9 +130,9 @@ export async function POST(request: NextRequest) {
     // Insert into database
     const [result] = await pool.execute(
       `INSERT INTO work_photos 
-       (category, caption, description, image_url, photo_date, is_published, display_order) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [category, caption || null, description || null, uploadResult.url, formattedDate, isPublished, displayOrder]
+       (category, media_type, caption, description, image_url, video_url, photo_date, is_published, display_order) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [category, mediaType, caption || null, description || null, imageUrl, videoUrl, formattedDate, isPublished, displayOrder]
     )
 
     const insertResult = result as any
@@ -118,7 +143,7 @@ export async function POST(request: NextRequest) {
       action_type: 'create',
       entity_type: 'work_photo',
       entity_id: photoId,
-      details: `Created work photo in category: ${category}`,
+      details: `Created work ${mediaType} in category: ${category}`,
       ip_address: getClientIp(request),
     })
 
@@ -126,7 +151,9 @@ export async function POST(request: NextRequest) {
       success: true,
       work_photo: {
         id: photoId,
-        image_url: uploadResult.url,
+        media_type: mediaType,
+        image_url: imageUrl,
+        video_url: videoUrl,
       },
     })
   } catch (error) {

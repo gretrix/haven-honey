@@ -4,6 +4,12 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
+import Navigation from '@/components/Navigation'
+
+interface ReviewImage {
+  image_url: string
+  display_order: number
+}
 
 interface Review {
   id: number
@@ -14,6 +20,9 @@ interface Review {
   screenshot_url: string
   tag: string
   is_featured: boolean
+  owner_reply: string | null
+  owner_reply_date: string | null
+  images: ReviewImage[]
 }
 
 const fadeInUp = {
@@ -36,6 +45,8 @@ export default function ReviewsPage() {
   const [loading, setLoading] = useState(true)
   const [selectedReview, setSelectedReview] = useState<Review | null>(null)
   const [filterTag, setFilterTag] = useState<string>('all')
+  const [currentImageIndex, setCurrentImageIndex] = useState<{ [key: number]: number }>({})
+  const [expandedReviews, setExpandedReviews] = useState<Set<number>>(new Set())
 
   const tags = ['all', 'Meal Prep', 'Cleaning', 'Organizing', 'Gift Wrapping', 'Matchmaking', 'Life Coaching']
 
@@ -67,48 +78,7 @@ export default function ReviewsPage() {
   return (
     <main className="min-h-screen bg-cream-100">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-cream-100/90 backdrop-blur-md border-b border-cream-300/50">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-4">
-            <Image
-              src="/images/haven-honey-logo-circle-transparent.png"
-              alt="Haven & Honey"
-              width={56}
-              height={56}
-              className="w-14 h-14"
-            />
-            <span className="font-serif text-xl text-brown hidden sm:block">
-              Haven & Honey
-            </span>
-          </Link>
-          <div className="flex items-center gap-6 sm:gap-10">
-            <Link
-              href="/"
-              className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium"
-            >
-              Home
-            </Link>
-            <Link
-              href="/work"
-              className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium"
-            >
-              My Work
-            </Link>
-            <Link
-              href="/submit-review"
-              className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium"
-            >
-              Submit Review
-            </Link>
-            <Link
-              href="/#contact"
-              className="btn-primary text-base py-3 px-6 sm:py-4 sm:px-8"
-            >
-              Contact
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <Navigation variant="page" />
 
       {/* Header */}
       <section className="pt-32 pb-16 px-6">
@@ -186,7 +156,7 @@ export default function ReviewsPage() {
         </div>
       </section>
 
-      {/* Reviews Grid */}
+      {/* Reviews Carousel - Mobile First */}
       <section className="px-6 pb-24">
         <div className="max-w-7xl mx-auto">
           {loading && (
@@ -204,72 +174,332 @@ export default function ReviewsPage() {
             </div>
           )}
 
+          {/* Mobile: Horizontal Scroll Carousel */}
+          <div className="lg:hidden">
+            <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide -mx-6 px-6">
+              {reviews.map((review) => {
+                const images = review.images && review.images.length > 0 ? review.images : [{ image_url: review.screenshot_url, display_order: 0 }]
+                const currentIdx = currentImageIndex[review.id] || 0
+                const isExpanded = expandedReviews.has(review.id)
+                
+                return (
+                  <motion.div
+                    key={review.id}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="flex-shrink-0 w-[85vw] max-w-sm snap-center"
+                  >
+                    <div className="bg-cream-50 rounded-3xl p-6 shadow-xl h-full flex flex-col">
+                      {/* Featured Badge */}
+                      {review.is_featured && (
+                        <div className="inline-flex items-center gap-1 bg-honey text-cream-50 px-3 py-1 rounded-full text-xs font-medium shadow-md mb-3 self-start">
+                          ⭐ Featured
+                        </div>
+                      )}
+
+                      {/* Image Carousel */}
+                      <div className="relative bg-cream-100 rounded-2xl overflow-hidden mb-4">
+                        <div className="aspect-square relative">
+                          <img
+                            src={`/api${images[currentIdx].image_url}`}
+                            alt={`Review from ${review.reviewer_name || 'Client'}`}
+                            className="w-full h-full object-cover"
+                          />
+                          
+                          {/* Image Navigation */}
+                          {images.length > 1 && (
+                            <>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setCurrentImageIndex(prev => ({
+                                    ...prev,
+                                    [review.id]: currentIdx > 0 ? currentIdx - 1 : images.length - 1
+                                  }))
+                                }}
+                                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-brown/80 text-cream-50 rounded-full flex items-center justify-center hover:bg-brown transition-colors"
+                              >
+                                ‹
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setCurrentImageIndex(prev => ({
+                                    ...prev,
+                                    [review.id]: currentIdx < images.length - 1 ? currentIdx + 1 : 0
+                                  }))
+                                }}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-brown/80 text-cream-50 rounded-full flex items-center justify-center hover:bg-brown transition-colors"
+                              >
+                                ›
+                              </button>
+                              
+                              {/* Dots Indicator */}
+                              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                                {images.map((_, idx) => (
+                                  <button
+                                    key={idx}
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      setCurrentImageIndex(prev => ({ ...prev, [review.id]: idx }))
+                                    }}
+                                    className={`w-2 h-2 rounded-full transition-all ${
+                                      idx === currentIdx ? 'bg-honey w-4' : 'bg-cream-50/60'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Review Content */}
+                      <div className="flex-1 flex flex-col">
+                        {/* Star Rating */}
+                        {review.star_rating && (
+                          <div className="text-honey text-xl mb-2">
+                            {'⭐'.repeat(review.star_rating)}
+                          </div>
+                        )}
+
+                        {/* Reviewer Info */}
+                        <h3 className="font-serif text-xl text-brown mb-1">
+                          {review.reviewer_name || 'Anonymous'}
+                        </h3>
+
+                        {review.review_date && (
+                          <p className="text-sm text-brown/60 mb-2">
+                            {new Date(review.review_date).toLocaleDateString('en-US', { 
+                              year: 'numeric', 
+                              month: 'short', 
+                              day: 'numeric' 
+                            })}
+                          </p>
+                        )}
+
+                        <span className="inline-block text-xs px-3 py-1 bg-sage/20 text-sage-dark rounded-full mb-3 self-start">
+                          {review.tag}
+                        </span>
+
+                        {/* Review Text */}
+                        {review.review_text && (
+                          <div className="mb-3">
+                            <p className={`text-sm text-brown/80 leading-relaxed ${!isExpanded ? 'line-clamp-3' : ''}`}>
+                              {review.review_text}
+                            </p>
+                            {review.review_text.length > 150 && (
+                              <button
+                                onClick={() => {
+                                  setExpandedReviews(prev => {
+                                    const newSet = new Set(prev)
+                                    if (newSet.has(review.id)) {
+                                      newSet.delete(review.id)
+                                    } else {
+                                      newSet.add(review.id)
+                                    }
+                                    return newSet
+                                  })
+                                }}
+                                className="text-sage text-xs mt-1 hover:underline"
+                              >
+                                {isExpanded ? 'Show less' : 'Read more'}
+                              </button>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Owner Reply */}
+                        {review.owner_reply && (
+                          <div className="mt-auto pt-3 border-t border-cream-200">
+                            <div className="flex items-start gap-2">
+                              <div className="flex-shrink-0 w-6 h-6 bg-honey/20 rounded-full flex items-center justify-center text-xs">
+                                👋
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-xs font-medium text-brown mb-1">Linda replied:</p>
+                                <p className="text-xs text-brown/70 leading-relaxed">{review.owner_reply}</p>
+                                {review.owner_reply_date && (
+                                  <p className="text-xs text-brown/50 mt-1">
+                                    {new Date(review.owner_reply_date).toLocaleDateString('en-US', { 
+                                      month: 'short', 
+                                      day: 'numeric' 
+                                    })}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Desktop: Grid Layout */}
           <motion.div
             initial="hidden"
             animate="visible"
             variants={staggerContainer}
-            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-3 gap-8"
           >
-            {reviews.map((review) => (
-              <motion.div
-                key={review.id}
-                variants={fadeInUp}
-                className="group cursor-pointer"
-                onClick={() => setSelectedReview(review)}
-              >
-                {/* Frame Container */}
-                <div className="relative bg-cream-50 rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
-                  {/* Featured Badge */}
-                  {review.is_featured && (
-                    <div className="absolute -top-3 -right-3 bg-honey text-cream-50 px-3 py-1 rounded-full text-xs font-medium shadow-lg z-10">
-                      ⭐ Featured
-                    </div>
-                  )}
-
-                  {/* Screenshot in "Frame" */}
-                  <div className="relative bg-cream-100 rounded-2xl overflow-hidden mb-4 border-4 border-cream-200 shadow-inner">
-                    <div className="aspect-[4/3]">
-                      <img
-                        src={`/api${review.screenshot_url}`}
-                        alt={`Review from ${review.reviewer_name || 'Client'}`}
-                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Review Info */}
-                  <div className="text-center">
-                    {review.star_rating && (
-                      <div className="text-honey mb-2">
-                        {'⭐'.repeat(review.star_rating)}
+            {reviews.map((review) => {
+              const images = review.images && review.images.length > 0 ? review.images : [{ image_url: review.screenshot_url, display_order: 0 }]
+              const currentIdx = currentImageIndex[review.id] || 0
+              const isExpanded = expandedReviews.has(review.id)
+              
+              return (
+                <motion.div
+                  key={review.id}
+                  variants={fadeInUp}
+                  className="group"
+                >
+                  <div className="bg-cream-50 rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 h-full flex flex-col">
+                    {/* Featured Badge */}
+                    {review.is_featured && (
+                      <div className="inline-flex items-center gap-1 bg-honey text-cream-50 px-3 py-1 rounded-full text-xs font-medium shadow-md mb-3 self-start">
+                        ⭐ Featured
                       </div>
                     )}
 
-                    <h3 className="font-serif text-lg text-brown mb-1">
-                      {review.reviewer_name || 'Anonymous'}
-                    </h3>
+                    {/* Image Carousel */}
+                    <div className="relative bg-cream-100 rounded-2xl overflow-hidden mb-4 cursor-pointer" onClick={() => setSelectedReview(review)}>
+                      <div className="aspect-square relative">
+                        <img
+                          src={`/api${images[currentIdx].image_url}`}
+                          alt={`Review from ${review.reviewer_name || 'Client'}`}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        
+                        {/* Image Navigation */}
+                        {images.length > 1 && (
+                          <>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setCurrentImageIndex(prev => ({
+                                  ...prev,
+                                  [review.id]: currentIdx > 0 ? currentIdx - 1 : images.length - 1
+                                }))
+                              }}
+                              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-brown/80 text-cream-50 rounded-full flex items-center justify-center hover:bg-brown transition-colors opacity-0 group-hover:opacity-100"
+                            >
+                              ‹
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setCurrentImageIndex(prev => ({
+                                  ...prev,
+                                  [review.id]: currentIdx < images.length - 1 ? currentIdx + 1 : 0
+                                }))
+                              }}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-brown/80 text-cream-50 rounded-full flex items-center justify-center hover:bg-brown transition-colors opacity-0 group-hover:opacity-100"
+                            >
+                              ›
+                            </button>
+                            
+                            {/* Dots Indicator */}
+                            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                              {images.map((_, idx) => (
+                                <div
+                                  key={idx}
+                                  className={`w-2 h-2 rounded-full transition-all ${
+                                    idx === currentIdx ? 'bg-honey w-4' : 'bg-cream-50/60'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
 
-                    {review.review_date && (
-                      <p className="text-sm text-brown/60 mb-2">
-                        {new Date(review.review_date).toLocaleDateString()}
-                      </p>
-                    )}
+                    {/* Review Content */}
+                    <div className="flex-1 flex flex-col">
+                      {/* Star Rating */}
+                      {review.star_rating && (
+                        <div className="text-honey text-lg mb-2">
+                          {'⭐'.repeat(review.star_rating)}
+                        </div>
+                      )}
 
-                    <span className="inline-block text-xs px-3 py-1 bg-sage/20 text-sage-dark rounded-full">
-                      {review.tag}
-                    </span>
+                      {/* Reviewer Info */}
+                      <h3 className="font-serif text-lg text-brown mb-1">
+                        {review.reviewer_name || 'Anonymous'}
+                      </h3>
 
-                    {review.review_text && (
-                      <p className="text-sm text-brown/80 mt-3 line-clamp-2">
-                        {review.review_text}
-                      </p>
-                    )}
+                      {review.review_date && (
+                        <p className="text-sm text-brown/60 mb-2">
+                          {new Date(review.review_date).toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'short', 
+                            day: 'numeric' 
+                          })}
+                        </p>
+                      )}
 
-                    <p className="text-xs text-sage mt-2">Click to enlarge</p>
+                      <span className="inline-block text-xs px-3 py-1 bg-sage/20 text-sage-dark rounded-full mb-3 self-start">
+                        {review.tag}
+                      </span>
+
+                      {/* Review Text */}
+                      {review.review_text && (
+                        <div className="mb-3">
+                          <p className={`text-sm text-brown/80 leading-relaxed ${!isExpanded ? 'line-clamp-2' : ''}`}>
+                            {review.review_text}
+                          </p>
+                          {review.review_text.length > 100 && (
+                            <button
+                              onClick={() => {
+                                setExpandedReviews(prev => {
+                                  const newSet = new Set(prev)
+                                  if (newSet.has(review.id)) {
+                                    newSet.delete(review.id)
+                                  } else {
+                                    newSet.add(review.id)
+                                  }
+                                  return newSet
+                                })
+                              }}
+                              className="text-sage text-xs mt-1 hover:underline"
+                            >
+                              {isExpanded ? 'Show less' : 'Read more'}
+                            </button>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Owner Reply */}
+                      {review.owner_reply && (
+                        <div className="mt-auto pt-3 border-t border-cream-200">
+                          <div className="flex items-start gap-2">
+                            <div className="flex-shrink-0 w-6 h-6 bg-honey/20 rounded-full flex items-center justify-center text-xs">
+                              👋
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-xs font-medium text-brown mb-1">Linda replied:</p>
+                              <p className="text-xs text-brown/70 leading-relaxed">{review.owner_reply}</p>
+                              {review.owner_reply_date && (
+                                <p className="text-xs text-brown/50 mt-1">
+                                  {new Date(review.owner_reply_date).toLocaleDateString('en-US', { 
+                                    month: 'short', 
+                                    day: 'numeric' 
+                                  })}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              )
+            })}
           </motion.div>
         </div>
       </section>

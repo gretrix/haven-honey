@@ -150,7 +150,8 @@ export async function PATCH(request: NextRequest) {
 
     const allowedFields = [
       'reviewer_name', 'review_date', 'star_rating', 'review_text', 
-      'tag', 'is_featured', 'is_published', 'display_order'
+      'tag', 'is_featured', 'is_published', 'display_order',
+      'owner_reply', 'owner_reply_date'
     ]
 
     for (const field of allowedFields) {
@@ -164,6 +165,11 @@ export async function PATCH(request: NextRequest) {
           } else {
             value = null
           }
+        }
+        
+        // Convert owner_reply_date to MySQL TIMESTAMP format
+        if (field === 'owner_reply_date' && value) {
+          value = new Date(value).toISOString().slice(0, 19).replace('T', ' ')
         }
         
         updates.push(`${field} = ?`)
