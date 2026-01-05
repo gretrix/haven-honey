@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
+import Navigation from '@/components/Navigation'
 
 interface BlogPost {
   id: number
@@ -66,48 +67,7 @@ export default function LifeWithLindaPage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-cream-100 via-cream-50 to-cream-100">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-cream-50/95 backdrop-blur-md border-b border-cream-300/50">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-4">
-            <Image
-              src="/images/haven-honey-logo-circle-transparent.png"
-              alt="Haven & Honey"
-              width={56}
-              height={56}
-              className="w-14 h-14"
-            />
-            <span className="font-serif text-xl text-brown hidden sm:block">
-              Haven & Honey
-            </span>
-          </Link>
-          <div className="flex items-center gap-6 sm:gap-10">
-            <Link
-              href="/"
-              className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium"
-            >
-              Home
-            </Link>
-            <Link
-              href="/reviews"
-              className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium"
-            >
-              Reviews
-            </Link>
-            <Link
-              href="/work"
-              className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium"
-            >
-              Work
-            </Link>
-            <Link
-              href="/#contact"
-              className="btn-primary text-base py-3 px-6 sm:py-4 sm:px-8"
-            >
-              Contact
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <Navigation variant="page" />
 
       {/* Header */}
       <section className="pt-32 pb-16 px-6">
@@ -192,7 +152,6 @@ export default function LifeWithLindaPage() {
               >
                 <Link href={`/life-with-linda/${post.slug}`}>
                   <div className="bg-cream-50 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 h-full flex flex-col">
-                    {/* Featured Image */}
                     {post.featured_image_url ? (
                       <div className="relative aspect-[16/10] overflow-hidden bg-cream-100">
                         <img

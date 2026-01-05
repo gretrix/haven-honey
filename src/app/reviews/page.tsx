@@ -48,6 +48,18 @@ export default function ReviewsPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState<{ [key: number]: number }>({})
   const [expandedReviews, setExpandedReviews] = useState<Set<number>>(new Set())
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (selectedReview) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [selectedReview])
+
   const tags = ['all', 'Meal Prep', 'Cleaning', 'Organizing', 'Gift Wrapping', 'Matchmaking', 'Life Coaching']
 
   useEffect(() => {
@@ -200,11 +212,17 @@ export default function ReviewsPage() {
                       {/* Image Carousel */}
                       <div className="relative bg-cream-100 rounded-2xl overflow-hidden mb-4">
                         <div className="aspect-square relative">
-                          <img
-                            src={`/api${images[currentIdx].image_url}`}
-                            alt={`Review from ${review.reviewer_name || 'Client'}`}
-                            className="w-full h-full object-cover"
-                          />
+                          {images[currentIdx]?.image_url ? (
+                            <img
+                              src={`/api${images[currentIdx].image_url}`}
+                              alt={`Review from ${review.reviewer_name || 'Client'}`}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-cream-200 flex items-center justify-center">
+                              <span className="text-brown/40">No image</span>
+                            </div>
+                          )}
                           
                           {/* Image Navigation */}
                           {images.length > 1 && (
@@ -368,11 +386,17 @@ export default function ReviewsPage() {
                     {/* Image Carousel */}
                     <div className="relative bg-cream-100 rounded-2xl overflow-hidden mb-4 cursor-pointer" onClick={() => setSelectedReview(review)}>
                       <div className="aspect-square relative">
-                        <img
-                          src={`/api${images[currentIdx].image_url}`}
-                          alt={`Review from ${review.reviewer_name || 'Client'}`}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
+                        {images[currentIdx]?.image_url ? (
+                          <img
+                            src={`/api${images[currentIdx].image_url}`}
+                            alt={`Review from ${review.reviewer_name || 'Client'}`}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-cream-200 flex items-center justify-center">
+                            <span className="text-brown/40">No image</span>
+                          </div>
+                        )}
                         
                         {/* Image Navigation */}
                         {images.length > 1 && (
@@ -511,14 +535,14 @@ export default function ReviewsPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50"
+            className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-[9999] overflow-y-auto"
             onClick={() => setSelectedReview(null)}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="relative max-w-3xl w-full bg-cream-50 rounded-3xl p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto"
+              className="relative max-w-3xl w-full bg-cream-50 rounded-3xl p-6 sm:p-8 shadow-2xl my-8"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}
@@ -538,11 +562,17 @@ export default function ReviewsPage() {
 
               {/* Screenshot */}
               <div className="relative bg-cream-100 rounded-2xl overflow-hidden mb-6 border-4 border-cream-200">
-                <img
-                  src={`/api${selectedReview.screenshot_url}`}
-                  alt={`Review from ${selectedReview.reviewer_name || 'Client'}`}
-                  className="w-full h-auto max-h-[50vh] object-contain"
-                />
+                {selectedReview.screenshot_url ? (
+                  <img
+                    src={`/api${selectedReview.screenshot_url}`}
+                    alt={`Review from ${selectedReview.reviewer_name || 'Client'}`}
+                    className="w-full h-auto max-h-[50vh] object-contain"
+                  />
+                ) : (
+                  <div className="w-full h-64 bg-cream-200 flex items-center justify-center">
+                    <span className="text-brown/40">No image available</span>
+                  </div>
+                )}
               </div>
 
               {/* Review Details */}

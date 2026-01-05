@@ -38,6 +38,18 @@ export default function WorkPage() {
   const [selectedPhoto, setSelectedPhoto] = useState<WorkPhoto | null>(null)
   const [filterCategory, setFilterCategory] = useState<string>('all')
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (selectedPhoto) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [selectedPhoto])
+
   const categories = ['all', 'Meal Prep', 'Cleaning', 'Organizing', 'Gift Wrapping']
 
   useEffect(() => {
@@ -206,14 +218,14 @@ export default function WorkPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-50"
+            className="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-[9999] overflow-y-auto"
             onClick={() => setSelectedPhoto(null)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="relative max-w-5xl w-full bg-cream-50 rounded-3xl overflow-hidden shadow-2xl"
+              className="relative max-w-5xl w-full bg-cream-50 rounded-3xl overflow-hidden shadow-2xl my-8"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}

@@ -138,8 +138,8 @@ export async function POST(request: NextRequest) {
     const isPublished = formData.get('is_published') === 'true'
     const displayOrder = formData.get('display_order') ? parseInt(formData.get('display_order') as string) : 0
 
-    // Convert date to MySQL DATE format (YYYY-MM-DD)
-    const formattedDate = photoDate ? new Date(photoDate).toISOString().split('T')[0] : null
+    // Convert date to MySQL DATE format (YYYY-MM-DD) - handle empty strings
+    const formattedDate = photoDate && photoDate.trim() !== '' ? new Date(photoDate).toISOString().split('T')[0] : null
     
     console.log('🔥 About to insert into database with values:')
     console.log('  - category:', category)
@@ -220,9 +220,13 @@ export async function PATCH(request: NextRequest) {
       if (updateFields[field] !== undefined) {
         let value = updateFields[field]
         
-        // Convert date to MySQL DATE format (YYYY-MM-DD)
-        if (field === 'photo_date' && value) {
-          value = new Date(value).toISOString().split('T')[0]
+        // Convert date to MySQL DATE format (YYYY-MM-DD) - handle empty strings
+        if (field === 'photo_date') {
+          if (value && value.trim() !== '') {
+            value = new Date(value).toISOString().split('T')[0]
+          } else {
+            value = null
+          }
         }
         
         updates.push(`${field} = ?`)

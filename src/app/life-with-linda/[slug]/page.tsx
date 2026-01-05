@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import Navigation from '@/components/Navigation'
 
 interface BlogPost {
   id: number
@@ -105,28 +106,7 @@ export default function BlogPostPage() {
   return (
     <main className="min-h-screen bg-cream-100">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-cream-50/95 backdrop-blur-md border-b border-cream-300/50">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-4">
-            <Image
-              src="/images/haven-honey-logo-circle-transparent.png"
-              alt="Haven & Honey"
-              width={56}
-              height={56}
-              className="w-14 h-14"
-            />
-            <span className="font-serif text-xl text-brown hidden sm:block">
-              Haven & Honey
-            </span>
-          </Link>
-          <Link
-            href="/life-with-linda"
-            className="text-brown/70 hover:text-brown transition-colors text-base sm:text-lg font-medium"
-          >
-            ← Back to Blog
-          </Link>
-        </div>
-      </nav>
+      <Navigation variant="page" />
 
       {/* Article */}
       <article className="pt-32 pb-24 px-6">

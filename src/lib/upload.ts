@@ -111,8 +111,13 @@ export async function saveUploadedFile(
 }
 
 // Delete uploaded file (for cleanup)
-export async function deleteUploadedFile(fileUrl: string): Promise<boolean> {
+export async function deleteUploadedFile(fileUrl: string | null): Promise<boolean> {
   try {
+    // Check if fileUrl is null or undefined
+    if (!fileUrl || typeof fileUrl !== 'string') {
+      return false
+    }
+    
     if (!fileUrl.startsWith('/uploads/')) {
       return false
     }
