@@ -275,7 +275,7 @@ export default function ReviewsPage() {
                       {/* Review Content */}
                       <div className="flex-1 flex flex-col">
                         {/* Star Rating */}
-                        {review.star_rating && (
+                        {review.star_rating && review.star_rating > 0 && (
                           <div className="text-honey text-xl mb-2">
                             {'⭐'.repeat(review.star_rating)}
                           </div>
@@ -445,7 +445,7 @@ export default function ReviewsPage() {
                     {/* Review Content */}
                     <div className="flex-1 flex flex-col">
                       {/* Star Rating */}
-                      {review.star_rating && (
+                      {review.star_rating && review.star_rating > 0 && (
                         <div className="text-honey text-lg mb-2">
                           {'⭐'.repeat(review.star_rating)}
                         </div>
@@ -577,7 +577,7 @@ export default function ReviewsPage() {
 
               {/* Review Details */}
               <div className="text-center">
-                {selectedReview.star_rating && (
+                {selectedReview.star_rating && selectedReview.star_rating > 0 && (
                   <div className="text-honey text-xl sm:text-2xl mb-3">
                     {'⭐'.repeat(selectedReview.star_rating)}
                   </div>
