@@ -566,7 +566,7 @@ export default function WorkPhotosModule() {
             <div className="relative mb-4 rounded-2xl overflow-hidden bg-cream-100 aspect-[4/3]">
               {photo.media_type === 'video' && photo.video_url ? (
                 <video
-                  src={photo.video_url}
+                  src={`/api${photo.video_url}`}
                   className="w-full h-full object-cover"
                   controls
                   preload="metadata"

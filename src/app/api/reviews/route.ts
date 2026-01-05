@@ -24,6 +24,8 @@ export async function GET(request: NextRequest) {
 
     const [rows] = await pool.execute(query, params)
     const reviews = rows as any[]
+    
+    console.log(`🔥 Public Reviews API: Found ${reviews.length} published reviews`)
 
     // Fetch images for each review
     for (const review of reviews) {
@@ -31,7 +33,12 @@ export async function GET(request: NextRequest) {
         'SELECT image_url, display_order FROM review_images WHERE review_id = ? ORDER BY display_order ASC',
         [review.id]
       )
-      review.images = imageRows
+      const images = imageRows as any[]
+      review.images = images
+      console.log(`🔥 Review ${review.id} (${review.reviewer_name}): ${images.length} images`)
+      if (images.length > 0) {
+        console.log(`🔥   Image URLs:`, images.map(img => img.image_url))
+      }
     }
 
     return NextResponse.json({

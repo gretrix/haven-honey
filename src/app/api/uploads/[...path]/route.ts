@@ -10,14 +10,18 @@ export async function GET(
   try {
     // Construct file path
     const filePath = path.join(process.cwd(), 'public', 'uploads', ...params.path)
+    
+    console.log('🔥 Uploads API: Requested file:', filePath)
 
     // Check if file exists
     if (!existsSync(filePath)) {
+      console.error('🔥 Uploads API: File not found:', filePath)
       return new NextResponse('File not found', { status: 404 })
     }
 
     // Read file
     const fileBuffer = await readFile(filePath)
+    console.log(`🔥 Uploads API: Serving file (${fileBuffer.length} bytes)`)
 
     // Determine content type based on file extension
     const ext = path.extname(filePath).toLowerCase()
@@ -27,6 +31,11 @@ export async function GET(
       '.png': 'image/png',
       '.gif': 'image/gif',
       '.webp': 'image/webp',
+      '.mp4': 'video/mp4',
+      '.mov': 'video/quicktime',
+      '.avi': 'video/x-msvideo',
+      '.webm': 'video/webm',
+      '.mpeg': 'video/mpeg',
     }
 
     const contentType = contentTypeMap[ext] || 'application/octet-stream'
@@ -39,7 +48,7 @@ export async function GET(
       },
     })
   } catch (error) {
-    console.error('Error serving uploaded file:', error)
+    console.error('🔥 Uploads API: Error serving file:', error)
     return new NextResponse('Internal Server Error', { status: 500 })
   }
 }
