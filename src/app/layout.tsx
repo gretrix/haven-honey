@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   description: 'Haven & Honey offers meal prep, cleaning, and home reset services. We bring warmth, intention, faith, and care into busy families and overwhelmed hearts.',
   keywords: ['meal prep', 'cleaning services', 'home organization', 'home resets', 'family services', 'Haven & Honey'],
   authors: [{ name: 'Linda - Haven & Honey' }],
+  alternates: {
+    canonical: 'https://havenhoney.co',
+  },
   icons: {
     icon: '/images/haven-honey-logo-circle-transparent.png',
     shortcut: '/images/haven-honey-logo-circle-transparent.png',
@@ -17,6 +20,7 @@ export const metadata: Metadata = {
     title: 'Haven & Honey | Making Homes Feel Loved',
     description: 'Meal prep, cleaning, and home reset services that bring peace and sweetness to your everyday life.',
     type: 'website',
+    url: 'https://havenhoney.co',
     images: ['/images/haven-honey-logo-horizontal-transparent.png'],
   },
 }
