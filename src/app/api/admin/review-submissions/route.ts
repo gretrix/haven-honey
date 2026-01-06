@@ -151,6 +151,17 @@ export async function PATCH(request: NextRequest) {
         success: true,
         message: 'Review submission rejected',
       })
+    } else if (action === 'undo_rejection') {
+      // Move rejected submission back to pending
+      await pool.execute(
+        'UPDATE review_submissions SET status = ?, reviewed_at = NULL WHERE id = ?',
+        ['pending', id]
+      )
+
+      return NextResponse.json({
+        success: true,
+        message: 'Review moved back to pending',
+      })
     } else {
       return NextResponse.json(
         { success: false, error: 'Invalid action' },

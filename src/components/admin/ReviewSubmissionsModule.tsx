@@ -145,6 +145,39 @@ export default function ReviewSubmissionsModule() {
     }
   }
 
+  const handleUndoRejection = async (submissionId: number) => {
+    if (!confirm('Undo rejection and move this back to pending?')) {
+      return
+    }
+
+    const savedPassword = localStorage.getItem('admin_password')
+
+    try {
+      const response = await fetch('/api/admin/review-submissions', {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${savedPassword}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: submissionId,
+          action: 'undo_rejection',
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success('Review moved back to pending!')
+        fetchSubmissions()
+      } else {
+        toast.error(data.error || 'Failed to undo rejection')
+      }
+    } catch (error) {
+      toast.error('Error undoing rejection')
+    }
+  }
+
   const deleteSubmission = async (id: number) => {
     if (!confirm('Are you sure you want to permanently delete this submission?')) {
       return
@@ -337,6 +370,14 @@ export default function ReviewSubmissionsModule() {
                         ✗ Reject
                       </button>
                     </>
+                  )}
+                  {submission.status === 'rejected' && (
+                    <button
+                      onClick={() => handleUndoRejection(submission.id)}
+                      className="btn-secondary text-xs bg-honey/20 hover:bg-honey/30 text-honey-dark"
+                    >
+                      ↺ Undo Rejection
+                    </button>
                   )}
                   <button
                     onClick={() => deleteSubmission(submission.id)}
